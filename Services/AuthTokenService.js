@@ -2,6 +2,9 @@ const Models = require('../Models')
 const mongoose = require('mongoose')
 
 module.exports = {
+  create(data) {
+    return Models.AuthTokenModel.create(data)
+  },
   getById: id => {
     return Models.AuthTokenModel.findOne({ _id: new mongoose.Types.ObjectId(id) }, null, { lean: true })
   },

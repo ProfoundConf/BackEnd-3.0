@@ -20,6 +20,6 @@ const ContactSchema = new mongoose.Schema({
     arrived: { type: Boolean },
     paid: { type: Boolean },
     password: { type: String }
-}, { timestamps: true });
+});
 
 module.exports = mongoose.model('Contact', ContactSchema);

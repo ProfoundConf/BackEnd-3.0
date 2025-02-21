@@ -1,4 +1,5 @@
 module.exports = {
     ContactService: require("./ContactService"),
-    AuthTokenService: require("./AuthTokenService")
+    AuthTokenService: require("./AuthTokenService"),
+    AdminService: require("./AdminService")
 }

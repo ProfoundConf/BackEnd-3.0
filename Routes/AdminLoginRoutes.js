@@ -23,5 +23,24 @@ module.exports = [
                 failAction: UnFx.failAction
             }
         }
+    },
+    {
+        method: 'POST',
+        path: '/admin/create',
+        handler: async(req, h) => AdminLoginController.createAdmin(req)
+        .then(res => UnFx.sendSuccess(res, h))
+        .catch(err => UnFx.sendError(err, h)),
+        options: {
+            description: 'Create new Admin account',
+            tags: ['api', 'admin', 'create'],
+            validate: {
+                payload: Joi.object({
+                    email: Joi.string().required(),
+                    password: Joi.string().required(),
+                    secret: Joi.string().required()
+                }).required(),
+                failAction: UnFx.failAction
+            }
+        }
     }
 ]

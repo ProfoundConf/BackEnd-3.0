@@ -5,7 +5,7 @@ const AuthTokenSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    contactId: {
+    adminId: {
         type: mongoose.Types.ObjectId,
         ref: 'Contact'
     },
