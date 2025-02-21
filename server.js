@@ -3,6 +3,13 @@
 const Hapi = require('@hapi/hapi');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose')
+
+const Inert = require('@hapi/inert');
+const Vision = require('@hapi/vision');
+const HapiSwagger = require('hapi-swagger');
+const Joi = require('joi');
+const Pack = require('./package.json');
+
 dotenv.config()
 
 const { RAILWAY_PUBLIC_DOMAIN: API_PATH, API_HOST, MONGODB_PATH, NODE_ENV } = process.env
@@ -16,6 +23,13 @@ const init = async () => {
         port: API_HOST,        // Set the port
         host: NODE_ENV === 'LOCAL' ? API_PATH : '0.0.0.0', // Set the host
     });
+
+    const swaggerOptions = {
+        info: {
+            title: 'API Documentation',
+            version: Pack.version,
+        },
+    };
     
     // Basic route: Responds with "Hello, Hapi!" when accessed via GET
     server.route({
@@ -25,6 +39,15 @@ const init = async () => {
             return 'Profound Backed is working good';
         }
     });
+
+    await server.register([
+        Inert,
+        Vision,
+        {
+            plugin: HapiSwagger,
+            options: swaggerOptions
+        }
+    ])
 
     server.ext('onRequest', (request, h) => {
         console.log(`Incoming Request: ${request.method.toUpperCase()} ${request.path}`);
