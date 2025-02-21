@@ -1,12 +1,12 @@
 const mongoose = require('mongoose')
 
-const AuthTokenSchema = new moongoose.Schema({
+const AuthTokenSchema = new mongoose.Schema({
     accessToken: {
         type: String,
         required: true
     },
     contactId: {
-        type: moongoose.Types.ObjectId,
+        type: mongoose.Types.ObjectId,
         ref: 'Contact'
     },
     createdAt: {
