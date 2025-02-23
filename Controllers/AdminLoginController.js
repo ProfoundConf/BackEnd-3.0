@@ -34,5 +34,24 @@ module.exports = {
         const hashedPassword = await bcrypt.hash(password, 10)
         const admin = await Services.AdminService.create({ email: email, password: hashedPassword })
         return { admin: admin }
+    },
+    loginAdminViaAccessToken: async(req) => {
+        const { accessToken } = req.payload
+        const tokenExists = await Services.AuthTokenService.getOne({ accessToken: accessToken })
+        if(!tokenExists){
+            throw 'No token with such access token found!'
+        }
+
+        const { _id } = jwt.verify(accessToken, process.env.JWT_SECRET)
+        const admin = await Services.AdminService.getById(_id)
+        if(!admin){
+            throw 'No admin with such id found!'
+        }
+        return { admin: admin, accessToken: accessToken }
+    },
+    logoutAdmin: async(req) => {
+        const accessToken = req.auth.token
+        await Services.AuthTokenService.deleteOne({ accessToken: accessToken })
+        return { message: 'Successfully logged out' }
     }
 }

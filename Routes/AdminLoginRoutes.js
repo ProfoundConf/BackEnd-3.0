@@ -42,5 +42,34 @@ module.exports = [
                 failAction: UnFx.failAction
             }
         }
+    },
+    {
+        method: 'POST',
+        path: '/admin/loginViaAccessToken',
+        handler: async(req, h) => AdminLoginController.loginAdminViaAccessToken(req)
+        .then(res => UnFx.sendSuccess(res, h))
+        .catch(err => UnFx.sendError(err, h)),
+        options: {
+            description: 'Admin Login Via Access Token',
+            tags: ['api', 'admin', 'login'],
+            validate: {
+                payload: Joi.object({
+                    accessToken: Joi.string().required(),
+                }).required(),
+                failAction: UnFx.failAction
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/admin/logout',
+        handler: async(req, h) => AdminLoginController.logoutAdmin(req)
+        .then(res => UnFx.sendSuccess(res, h))
+        .catch(err => UnFx.sendError(err, h)),
+        options: {
+            description: 'Admin Logout',
+            tags: ['api', 'admin', 'logout'],
+            auth: 'jwt'
+        }
     }
 ]

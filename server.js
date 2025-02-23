@@ -9,6 +9,7 @@ const Vision = require('@hapi/vision');
 const HapiSwagger = require('hapi-swagger');
 const Joi = require('joi');
 const Pack = require('./package.json');
+const { registerAuth } = require('./Other/auth')
 
 dotenv.config()
 
@@ -24,6 +25,8 @@ const init = async () => {
         host: NODE_ENV === 'LOCAL' ? API_PATH : '0.0.0.0', // Set the host
     });
 
+    registerAuth(server)
+
     const swaggerOptions = {
         info: {
             title: 'API Documentation',
@@ -31,7 +34,7 @@ const init = async () => {
         },
     };
     
-    // Basic route: Responds with "Hello, Hapi!" when accessed via GET
+    // Basic route: Responds when accessed via GET
     server.route({
         method: 'GET',
         path: '/',
