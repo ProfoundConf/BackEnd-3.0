@@ -12,10 +12,8 @@ const ContactSchema = new mongoose.Schema({
         Sa: Boolean,
     },
     location: {
-        address: { type: String },
-        phone: { type: String },
-        color: { type: String },
-        needAccommodation: { type: Boolean }
+        type: ObjectId,
+        ref: 'Address'
     },
     arrived: { type: Boolean },
     paid: { type: Boolean }

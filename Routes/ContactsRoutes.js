@@ -16,12 +16,7 @@ const contactValidation = Joi.object({
         Fr: Joi.boolean(),
         Sa: Joi.boolean()
     }).required(),
-    location: Joi.object({
-        address: Joi.string().required(),
-        phone: Joi.string().required(),
-        color: Joi.string(),
-        needAccommodation: Joi.boolean()
-    }).required(),
+    location: Joi.string().optional(),
     arrived: Joi.boolean(),
     paid: Joi.boolean()
 })
@@ -37,12 +32,7 @@ const contactOptionalValidation = Joi.object({
         Fr: Joi.boolean(),
         Sa: Joi.boolean()
     }).optional(),
-    location: Joi.object({
-        address: Joi.string().optional(),
-        phone: Joi.string().optional(),
-        color: Joi.string(),
-        needAccommodation: Joi.boolean()
-    }).optional(),
+    location: Joi.string().optional(),
     arrived: Joi.boolean(),
     paid: Joi.boolean()
 })
