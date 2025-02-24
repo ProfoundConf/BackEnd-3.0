@@ -7,7 +7,7 @@ const UnFx = {
 }
 
 const constants = {
-
+    ACCOMMODATION_LIMIT: 90
 }
 
 module.exports = {

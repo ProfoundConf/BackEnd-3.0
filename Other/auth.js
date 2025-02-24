@@ -37,7 +37,7 @@ const registerAuth = async (server) => {
         verifyOptions: { algorithms: ['HS256'] }
     });
 
-    server.auth.default('jwt');
+    // server.auth.default('jwt');
 };
 
 module.exports = {

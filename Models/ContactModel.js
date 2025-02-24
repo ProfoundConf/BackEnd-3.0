@@ -18,8 +18,7 @@ const ContactSchema = new mongoose.Schema({
         needAccommodation: { type: Boolean }
     },
     arrived: { type: Boolean },
-    paid: { type: Boolean },
-    password: { type: String }
+    paid: { type: Boolean }
 });
 
 module.exports = mongoose.model('Contact', ContactSchema);
