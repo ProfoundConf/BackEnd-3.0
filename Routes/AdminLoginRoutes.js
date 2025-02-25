@@ -72,5 +72,5 @@ module.exports = [
             tags: ['api', 'admin', 'logout'],
             auth: 'jwt'
         }
-    }
+    },
 ]
