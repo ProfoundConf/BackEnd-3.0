@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
+const ObjectId = require('mongoose').Types.ObjectId
 
-const ContactSchema = new mongoose.Schema({
-    name: { type: String },
+const AddressSchema = new mongoose.Schema({
     address: { type: String },
     phone: { type: String },
-    maxPeople: { type: Number },
+    color: { type: String },
+    maxCount: { type: Number },
 });
 
-module.exports = mongoose.model('Contact', ContactSchema);
+module.exports = mongoose.model('Address', AddressSchema);

@@ -1,3 +1,6 @@
+
 module.exports = {
-    AdminLoginController: require('./AdminLoginController')
+    AdminLoginController: require('./AdminLoginController'),
+    ContactsController: require('./ContactsController'),
+    AddressController: require('./AddressController')
 }
