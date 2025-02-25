@@ -8,9 +8,14 @@ module.exports = {
     getAddressById: async(req) => {
         try{
             const { _id } = req.params
+            const populate = req.query?.populate || []
             const address = await Services.AddressService.getById(_id)
             if(!address){
                 throw 'Address Not Found!'
+            }
+            
+            if(populate.includes('contacts')){
+                address._contacts = await Services.ContactService.get({ location: new ObjectId(_id) })
             }
             return { address: address }
         } catch(err) {
@@ -20,7 +25,8 @@ module.exports = {
     },
     getAddress: async(req) => {
         try{
-            const query = req.query
+            const query = req.query || {}
+            const populate = req.query.populate || []
 
             let criteriaAll = []
 
@@ -34,6 +40,10 @@ module.exports = {
             
             if(query.maxCount){
                 criteriaAll.push({ maxCount: query.maxCount })
+            }
+
+            if(populate.includes('contacts')){
+                criteriaAll.push({ $lookup: { from: 'contacts', localField: '_id', foreignField: 'location', as: '_contacts' } })
             }
     
             const addresses = await Services.AddressService.aggregate(criteriaAll)

@@ -13,17 +13,6 @@ const addressValidation = Joi.object({
     color: Joi.string().optional(),
 });
 
-const addressExample = Joi.object({
-    success: Joi.boolean().example(true),
-    message: Joi.string().example('Success'),
-    data: Joi.object({
-        address: Joi.string().example('Soborna 100 A'),
-        phone: Joi.string().example('123121232233'),
-        maxCount: Joi.number().example(4),
-        color: Joi.string().example('red'),
-    })
-}).label('Address Response')
-
 const addressOptionalValidation = Joi.object({
     address: Joi.string().optional(),
     phone: Joi.string().optional(),
@@ -45,10 +34,10 @@ module.exports = [
                 params: Joi.object({
                     _id: Joi.objectId().required()
                 }),
+                query: Joi.object({
+                    populate: Joi.array().items(Joi.string().trim().valid('contacts')).optional()
+                }).optional(),
                 failAction: UnFx.failAction
-            },
-            response: {
-                schema: addressExample
             },
             auth: 'jwt'
         }
@@ -67,6 +56,7 @@ module.exports = [
                     address: Joi.string().optional(),
                     phone: Joi.string().optional(),
                     maxCount: Joi.number().optional(),
+                    populate: Joi.array().items(Joi.string().trim().valid('contacts')).optional()
                 }).optional(),
                 failAction: UnFx.failAction
             },

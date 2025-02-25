@@ -10,6 +10,7 @@ const contactValidation = Joi.object({
     fullName: Joi.string().required(),
     age: Joi.string().required(),
     phone: Joi.string().required(),
+    needAccommodation: Joi.boolean().optional(),
     email: Joi.string().email().required(),
     city: Joi.string().required(),
     church: Joi.string().required(),
@@ -17,7 +18,7 @@ const contactValidation = Joi.object({
         Fr: Joi.boolean(),
         Sa: Joi.boolean()
     }).required(),
-    location: Joi.string().optional(),
+    location: Joi.objectId().optional(),
     arrived: Joi.boolean().optional(),
     paid: Joi.boolean().optional()
 })
@@ -26,6 +27,7 @@ const contactOptionalValidation = Joi.object({
     fullName: Joi.string().optional(),
     age: Joi.string().optional(),
     phone: Joi.string().optional(),
+    needAccommodation: Joi.boolean().optional(),
     email: Joi.string().email().optional(),
     city: Joi.string().optional(),
     church: Joi.string().optional(),
@@ -33,7 +35,7 @@ const contactOptionalValidation = Joi.object({
         Fr: Joi.boolean(),
         Sa: Joi.boolean()
     }).optional(),
-    location: Joi.string().optional(),
+    location: Joi.objectId().optional(),
     arrived: Joi.boolean().optional(),
     paid: Joi.boolean().optional()
 })
@@ -52,6 +54,9 @@ module.exports = [
                 params: Joi.object({
                     _id: Joi.objectId().required()
                 }),
+                query: Joi.object({
+                    populate: Joi.array().items(Joi.string().trim().valid('location')).optional()
+                }).optional(),
                 failAction: UnFx.failAction
             },
             auth: 'jwt'
@@ -104,7 +109,9 @@ module.exports = [
                     city: Joi.string().trim().optional(),
                     church: Joi.string().trim().optional(),
                     eatDays: Joi.array().items(Joi.string().valid('Fr', 'Sa')).optional(), // Only 'Fr' or 'Sa' allowed
-                    arrived: Joi.boolean().optional() // Explicitly checking for boolean value
+                    arrived: Joi.boolean().optional(), // Explicitly checking for boolean value
+                    needAccommodation: Joi.boolean().optional(),
+                    populate: Joi.array().items(Joi.string().trim().valid('location')).optional(),
                 }).optional(),
                 failAction: UnFx.failAction
             },

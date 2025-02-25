@@ -4,21 +4,83 @@ const jwt = require('jsonwebtoken')
 const { UnFx, constants } = require('../Other/constants')
 const ObjectId = require('mongoose').Types.ObjectId
 
+const freeAddresses = [
+    {
+        $lookup: {
+            from: "contacts",
+            localField: "_id",
+            foreignField: "location",
+            as: "linkedContacts"
+        }
+    },
+    {
+        $addFields: {
+            usedSpots: { $size: "$linkedContacts" },
+            freeSpots: { $subtract: ["$maxCount", { $size: "$linkedContacts" }] }
+        }
+    },
+    {
+        $match: { freeSpots: { $gt: 0 } }
+    },
+    {
+        $group: {
+            _id: null,
+            totalFreeSpots: { $sum: "$freeSpots" }
+        }
+    }
+]
+
+const contactsNeedAccommodationCriteria = [
+    {
+        $match: {
+            'needAccommodation': true,
+            'location': {
+                $exists: false
+            }
+        }
+    },
+    {
+        $count: 'count'
+    }
+]
+
 module.exports = {
     getContactById: async(req) => {
         const { _id } = req.params
+        const populate = req.query?.populate || []
         const contact = await Services.ContactService.getById(_id)
         if(!contact){
-            throw 'Contact Not Found!'
+            throw {
+                statusCode: 404,
+                message: 'Contact not found!'
+            }
         }
+
+        if(populate.includes('location')){
+            contact._location = await Services.AddressService.getById(contact.location)
+        }
+
         return { contact: contact }
     },
     getContactsForLiving: async(req) => {
         try{
+            // Check if we have spaces(finish later)
+            // const freeSpaces = (await Services.AddressService.aggregate(freeAddresses))?.[0]?.totalFreeSpots || 0
+            // const contactsNeedAccommodationCriteria = (await Services.ContactService.aggregate(contactsNeedAccommodationCriteria))?.[0]?.count || 0
+            // if(contactsNeedAccommodationCriteria >= freeSpaces){
+            //     throw {
+            //         statusCode: 403,
+            //         message: 'Maximum accommodation limit reached'
+            //     }
+            // }
+
             const groupCriteria = [
                 {
                     $match: {
-                        'needAccommodation': true
+                        'needAccommodation': true,
+                        'location': {
+                            $exists: false
+                        }
                     }
                 },
                 {
@@ -54,6 +116,7 @@ module.exports = {
                   }
             ]
             const contacts = (await Services.ContactService.aggregate(groupCriteria))?.[0]?.result
+
             return { contacts: contacts }
         }catch(err){
             throw err
@@ -74,6 +137,7 @@ module.exports = {
     getContacts: async(req) => {
         try{
             const query = { ...req.query } || {}
+            const populate = req?.query?.populate || []
 
             const criteriaAll = []
     
@@ -93,6 +157,54 @@ module.exports = {
             }
             
             if (query.hasOwnProperty('arrived')) criteriaAll.push({ $match: { arrived: query.arrived } });
+
+            if(query.hasOwnProperty('needAccommodation')){
+                if(query.needAccommodation){
+                    criteriaAll.push({
+                        $match: {
+                            'needAccommodation': true,
+                            'location': {   
+                                $exists: false
+                            }
+                        }
+                    })
+                }else{
+                    criteriaAll.push({
+                        $match: {
+                            $or: [
+                                {
+                                    'needAccommodation': false,
+                                },
+                                {
+                                    'needAccommodation': true,
+                                    'location': {
+                                        $exists: true
+                                    }
+                                }
+                            ]
+                        }
+                    })
+                }
+            }
+
+            if(populate.includes('location')){
+                 criteriaAll.push(
+                    {
+                        $lookup: {
+                            from: "addresses",
+                            localField: "location",
+                            foreignField: "_id",
+                            as: "_location"
+                        },
+                    },
+                    {
+                        $unwind: {
+                            path: '$_location',
+                            preserveNullAndEmptyArrays: true
+                        }
+                    }
+                )
+            }
     
             const contacts = await Services.ContactService.aggregate(criteriaAll)
             return { contacts: contacts }
@@ -104,21 +216,18 @@ module.exports = {
     createContact: async(req) => {
         try{
             const payload = req.payload
-            // if(payload.location.needAccommodation){
-            //     let accommodationCount = (await Services.ContactService.aggregate([
-            //         {
-            //             $match: {
-            //                 'location.needAccommodation': true
-            //             }
-            //         },
-            //         {
-            //             $count: 'count'
-            //         }
-            //     ]))?.[0]?.count || 0
-            //     if(accommodationCount >= constants.ACCOMMODATION_LIMIT){
-            //         throw 'No space left for accommodation!'
-            //     }
-            // }
+            if(payload.needAccommodation){
+                let freeSpaces = (await Services.AddressService.aggregate(freeAddresses))?.[0]?.totalFreeSpots || 0
+
+                let contactsNeedAccommodation = (await Services.ContactService.aggregate(contactsNeedAccommodationCriteria))?.[0]?.count || 0
+
+                if(contactsNeedAccommodation >= freeSpaces){
+                    throw  {
+                        statusCode: 403,
+                        message: 'Maximum accommodation limit reached'
+                    }
+                }
+            }
             const contact = await Services.ContactService.create(payload)
             return { contact: contact }
         } catch(err) {
@@ -130,10 +239,22 @@ module.exports = {
         const { _id } = req.params
         const contact = await Services.ContactService.getById(_id)
         if(!contact){
-            throw 'Contact not found!'
+            throw {
+                statusCode: 404,
+                message: 'Contact not found!'
+            }
         }
 
         const payload = req.payload
+        if(payload.location){
+            let locationExists = await Services.AddressService.getById(payload.location)
+            if(!locationExists){
+                throw {
+                    statusCode: 403,
+                    message: 'Unable to update, location not found!'
+                }
+            }
+        }
         const updatedContact = await Services.ContactService.updateOne({ _id: new ObjectId(_id) }, payload)
         return { contact: updatedContact }
     },
@@ -142,11 +263,14 @@ module.exports = {
             const { _id } = req.params
             const contact = await Services.ContactService.getById(_id)
             if(!contact){
-                throw 'Contact not found!'
+                throw {
+                    statusCode: 404,
+                    message: 'Contact not found!'
+                }
             }
     
             await Services.ContactService.deleteOne({ _id: new ObjectId(_id) })
-            return { message: 'Contact Deleted Succesful!' }
+            return { deleted: true }
         } catch(err) {
             console.log(err)
             throw err
