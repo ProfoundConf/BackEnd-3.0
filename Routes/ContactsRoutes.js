@@ -1,4 +1,5 @@
 const Joi = require('joi')
+Joi.objectId = require('joi-objectid')(Joi);
 const Services = require('../Services')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -17,8 +18,8 @@ const contactValidation = Joi.object({
         Sa: Joi.boolean()
     }).required(),
     location: Joi.string().optional(),
-    arrived: Joi.boolean(),
-    paid: Joi.boolean()
+    arrived: Joi.boolean().optional(),
+    paid: Joi.boolean().optional()
 })
 
 const contactOptionalValidation = Joi.object({
@@ -33,8 +34,8 @@ const contactOptionalValidation = Joi.object({
         Sa: Joi.boolean()
     }).optional(),
     location: Joi.string().optional(),
-    arrived: Joi.boolean(),
-    paid: Joi.boolean()
+    arrived: Joi.boolean().optional(),
+    paid: Joi.boolean().optional()
 })
 
 module.exports = [
@@ -49,10 +50,65 @@ module.exports = [
             tags: ['api', 'contacts', 'get'],
             validate: {
                 params: Joi.object({
-                    _id: Joi.string().required()
+                    _id: Joi.objectId().required()
                 }),
                 failAction: UnFx.failAction
-            }
+            },
+            auth: 'jwt'
+        }
+    },
+    {
+        method: 'GET',
+        path: '/contacts/for-living',
+        handler: async(req, h) => ContactsController.getContactsForLiving(req)
+        .then(res => UnFx.sendSuccess(res, h))
+        .catch(err => UnFx.sendError(err, h)),
+        options: {
+            description: 'Get Contact who need accommodation',
+            tags: ['api', 'contacts', 'get', 'accommodation'],
+            auth: 'jwt'
+        }
+    },
+    {
+        method: 'GET',
+        path: '/contacts/churches-by-city',
+        handler: async(req, h) => ContactsController.getChurchesByCity(req)
+        .then(res => UnFx.sendSuccess(res, h))
+        .catch(err => UnFx.sendError(err, h)),
+        options: {
+            description: 'Get Churches By City',
+            tags: ['api', 'contacts', 'get', 'churches'],
+            validate: {
+                query: Joi.object({
+                    city: Joi.string().trim().required()
+                }),
+                failAction: UnFx.failAction
+            },
+            auth: 'jwt'
+        }
+    },
+    {
+        method: 'GET',
+        path: '/contacts',
+        handler: async(req, h) => ContactsController.getContacts(req)
+        .then(res => UnFx.sendSuccess(res, h))
+        .catch(err => UnFx.sendError(err, h)),
+        options: {
+            description: 'Get Contacts',
+            tags: ['api', 'contacts', 'get'],
+            validate: {
+                query: Joi.object({
+                    name: Joi.string().trim().optional(), // Regex will be applied in MongoDB
+                    email: Joi.string().trim().optional(), // Ensuring valid email format
+                    phone: Joi.string().trim().optional(), // Assuming phone number as string
+                    city: Joi.string().trim().optional(),
+                    church: Joi.string().trim().optional(),
+                    eatDays: Joi.array().items(Joi.string().valid('Fr', 'Sa')).optional(), // Only 'Fr' or 'Sa' allowed
+                    arrived: Joi.boolean().optional() // Explicitly checking for boolean value
+                }).optional(),
+                failAction: UnFx.failAction
+            },
+            auth: 'jwt'
         }
     },
     {
@@ -81,11 +137,30 @@ module.exports = [
             tags: ['api', 'contacts', 'update'],
             validate: {
                 params: Joi.object({
-                    _id: Joi.string().required()
+                    _id: Joi.objectId().required()
                 }),
                 payload: contactOptionalValidation,
                 failAction: UnFx.failAction
-            }
+            },
+            auth: 'jwt'
+        }
+    },
+    {
+        method: 'DELETE',
+        path: '/contacts/{_id}',
+        handler: async(req, h) => ContactsController.deleteContact(req)
+        .then(res => UnFx.sendSuccess(res, h))
+        .catch(err => UnFx.sendError(err, h)),
+        options: {
+            description: 'Delete Some Contact',
+            tags: ['api', 'contacts', 'delete'],
+            validate: {
+                params: Joi.object({
+                    _id: Joi.objectId().required()
+                }).required(),
+                failAction: UnFx.failAction
+            },
+            auth: 'jwt'
         }
     },
 ]

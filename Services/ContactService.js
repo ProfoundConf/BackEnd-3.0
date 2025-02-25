@@ -22,7 +22,7 @@ module.exports = {
     return Models.ContactModel.findOne(query, projection)
   },
   aggregate: async (criteria, populate) => {
-    let data = await Models.ContactModel.aggregate(criteria).allowDiskUse(true).exec()
+    let data = await Models.ContactModel.aggregate(criteria?.length === 0 ? [{ $match: {} }] : criteria).allowDiskUse(true).exec()
 
     if (populate) {
       return await Models.ContactModel.populate(data, populate)

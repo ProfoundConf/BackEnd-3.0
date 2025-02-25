@@ -31,6 +31,12 @@ module.exports = {
                 statusCode: 403
             }
         }
+        
+        const adminExists = await Services.AdminService.getOne({ email: email })
+        if(adminExists){
+            throw 'Admin with such email already exists!'
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10)
         const admin = await Services.AdminService.create({ email: email, password: hashedPassword })
         return { admin: admin }
