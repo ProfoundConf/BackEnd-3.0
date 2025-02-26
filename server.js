@@ -39,7 +39,13 @@ const init = async () => {
         method: 'GET',
         path: '/',
         handler: (request, h) => {
-            return 'Profound Backed is working good';
+            let responseText = `<p>Profound Backend is working good</p>`;
+    
+            if (API_PATH && API_HOST) {
+                responseText += `<p><a href="http${NODE_ENV === 'LOCAL' ? '' : 's'}://${API_PATH}:${API_HOST}/documentation#/">API Documentation</a></p>`;
+            }
+    
+            return h.response(responseText).type('text/html');
         }
     });
 
