@@ -119,6 +119,23 @@ module.exports = [
         }
     },
     {
+        method: 'GET',
+        path: '/contacts/check-registration',
+        handler: async(req, h) => ContactsController.checkRegistration(req)
+        .then(res => UnFx.sendSuccess(res, h))
+        .catch(err => UnFx.sendError(err, h)),
+        options: {
+            description: 'Check If Contact Was Registered Before By Phone Number',
+            tags: ['api', 'contacts', 'get', 'phone'],
+            validate: {
+                query: Joi.object({
+                    phone: Joi.string().trim().required()
+                }),
+                failAction: UnFx.failAction
+            }
+        }
+    },
+    {
         method: 'POST',
         path: '/contacts',
         handler: async(req, h) => ContactsController.createContact(req)

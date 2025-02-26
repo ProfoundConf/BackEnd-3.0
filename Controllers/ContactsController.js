@@ -64,16 +64,6 @@ module.exports = {
     },
     getContactsForLiving: async(req) => {
         try{
-            // Check if we have spaces(finish later)
-            // const freeSpaces = (await Services.AddressService.aggregate(freeAddresses))?.[0]?.totalFreeSpots || 0
-            // const contactsNeedAccommodationCriteria = (await Services.ContactService.aggregate(contactsNeedAccommodationCriteria))?.[0]?.count || 0
-            // if(contactsNeedAccommodationCriteria >= freeSpaces){
-            //     throw {
-            //         statusCode: 403,
-            //         message: 'Maximum accommodation limit reached'
-            //     }
-            // }
-
             const groupCriteria = [
                 {
                     $match: {
@@ -213,6 +203,41 @@ module.exports = {
             throw err
         }
     },
+    checkRegistration: async(req) => {
+        try{
+            const { phone } = req.query
+            const oldContact = (await Services.OldContactService.aggregate([
+                {
+                    $addFields: {
+                        phone: {
+                            $reduce: {
+                            input: ["(", ")", " ", "-"],
+                            initialValue: "$phone",
+                            in: { $replaceAll: { input: "$$value", find: "$$this", replacement: "" } }
+                            }
+                        }
+                    }
+                },
+                {
+                    $match: {
+                        phone: phone
+                    }
+                }
+            ]))?.[0]
+            if(!oldContact){
+                throw {
+                    statusCode: 404,
+                    registered: false,
+                    message: 'Old Contact not found!'
+                }
+            }
+
+            return { contact: oldContact }
+        }catch(err){
+            console.log(err)
+            throw err       
+        }
+    },
     createContact: async(req) => {
         try{
             const payload = req.payload
@@ -246,6 +271,18 @@ module.exports = {
         }
 
         const payload = req.payload
+        if(payload.needAccommodation){
+            let freeSpaces = (await Services.AddressService.aggregate(freeAddresses))?.[0]?.totalFreeSpots || 0
+
+            let contactsNeedAccommodation = (await Services.ContactService.aggregate(contactsNeedAccommodationCriteria))?.[0]?.count || 0
+
+            if(contactsNeedAccommodation >= freeSpaces){
+                throw  {
+                    statusCode: 403,
+                    message: 'Maximum accommodation limit reached'
+                }
+            }
+        }
         if(payload.location){
             let locationExists = await Services.AddressService.getById(payload.location)
             if(!locationExists){
