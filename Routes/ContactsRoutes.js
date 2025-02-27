@@ -21,7 +21,8 @@ const contactValidation = Joi.object({
     }).required(),
     location: Joi.objectId().optional(),
     arrived: Joi.boolean().optional(),
-    paid: Joi.boolean().optional()
+    paid: Joi.boolean().optional(),
+    chatId: Joi.number().optional()
 })
 
 const contactOptionalValidation = Joi.object({
@@ -39,7 +40,8 @@ const contactOptionalValidation = Joi.object({
     }).optional(),
     location: Joi.objectId().optional(),
     arrived: Joi.boolean().optional(),
-    paid: Joi.boolean().optional()
+    paid: Joi.boolean().optional(),
+    chatId: Joi.number().optional()
 })
 
 module.exports = [

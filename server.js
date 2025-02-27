@@ -16,6 +16,7 @@ dotenv.config()
 const { RAILWAY_PUBLIC_DOMAIN: API_PATH, API_HOST, MONGODB_PATH, NODE_ENV } = process.env
 
 const routes = require('./Routes/index')
+const telegram = require('./Routes/TelegramRoute')
 
 
 const init = async () => {
