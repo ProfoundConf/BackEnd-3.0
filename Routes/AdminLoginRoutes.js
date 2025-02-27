@@ -53,12 +53,7 @@ module.exports = [
         options: {
             description: 'Admin Login Via Access Token',
             tags: ['api', 'admin', 'login'],
-            validate: {
-                payload: Joi.object({
-                    accessToken: Joi.string().required(),
-                }).required(),
-                failAction: UnFx.failAction
-            }
+            auth: 'jwt'
         }
     },
     {

@@ -42,18 +42,24 @@ module.exports = {
         return { admin: admin }
     },
     loginAdminViaAccessToken: async(req) => {
-        const { accessToken } = req.payload
-        const tokenExists = await Services.AuthTokenService.getOne({ accessToken: accessToken })
+        const { token } = req.auth
+        const tokenExists = await Services.AuthTokenService.getOne({ accessToken: token })
         if(!tokenExists){
-            throw 'No token with such access token found!'
+            throw {
+                statusCode: 401,
+                messsage: 'No token with such access token found!'
+            }
         }
 
-        const { _id } = jwt.verify(accessToken, process.env.JWT_SECRET)
+        const { _id } = jwt.verify(token, process.env.JWT_SECRET)
         const admin = await Services.AdminService.getById(_id)
         if(!admin){
-            throw 'No admin with such id found!'
+            throw {
+                statusCode: 401,
+                message: 'No admin with such id found!'
+            }
         }
-        return { admin: admin, accessToken: accessToken }
+        return { admin: admin, accessToken: token }
     },
     logoutAdmin: async(req) => {
         const accessToken = req.auth.token
