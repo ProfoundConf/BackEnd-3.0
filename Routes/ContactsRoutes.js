@@ -14,6 +14,7 @@ const contactValidation = Joi.object({
     email: Joi.string().email().required(),
     city: Joi.string().required(),
     church: Joi.string().required(),
+    sex: Joi.string().valid('M','F').required(),
     eatDays: Joi.object({
         Fr: Joi.boolean(),
         Sa: Joi.boolean()
@@ -31,6 +32,7 @@ const contactOptionalValidation = Joi.object({
     email: Joi.string().email().optional(),
     city: Joi.string().optional(),
     church: Joi.string().optional(),
+    sex: Joi.string().valid('M','F').optional(),
     eatDays: Joi.object({
         Fr: Joi.boolean(),
         Sa: Joi.boolean()
@@ -109,6 +111,7 @@ module.exports = [
                     city: Joi.string().trim().optional(),
                     church: Joi.string().trim().optional(),
                     eatDays: Joi.array().items(Joi.string().valid('Fr', 'Sa')).optional(), // Only 'Fr' or 'Sa' allowed
+                    sex: Joi.string().valid('M','F').optional(),
                     arrived: Joi.boolean().optional(), // Explicitly checking for boolean value
                     needAccommodation: Joi.boolean().optional(),
                     populate: Joi.array().items(Joi.string().trim().valid('location')).optional(),

@@ -42,6 +42,14 @@ module.exports = {
                 criteriaAll.push({ maxCount: query.maxCount })
             }
 
+            if(query.femaleCount){
+                criteriaAll.push({ femaleCount: query.femaleCount })
+            }
+
+            if(query.maleCount){
+                criteriaAll.push({ maleCount: query.maleCount })
+            }
+
             if(populate.includes('contacts')){
                 criteriaAll.push({ $lookup: { from: 'contacts', localField: '_id', foreignField: 'location', as: '_contacts' } })
             }

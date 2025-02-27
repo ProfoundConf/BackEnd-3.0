@@ -177,6 +177,14 @@ module.exports = {
                 }
             }
 
+            if(query.sex){
+                criteriaAll.push({
+                    $match: {
+                        'sex': query.sex
+                    }
+                })
+            }
+
             if(populate.includes('location')){
                  criteriaAll.push(
                     {

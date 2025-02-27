@@ -11,6 +11,8 @@ const addressValidation = Joi.object({
     phone: Joi.string().required(),
     maxCount: Joi.number().required(),
     color: Joi.string().optional(),
+    femaleCount: Joi.number().optional(),
+    maleCount: Joi.number().optional(),
 });
 
 const addressOptionalValidation = Joi.object({
@@ -18,6 +20,8 @@ const addressOptionalValidation = Joi.object({
     phone: Joi.string().optional(),
     color: Joi.string().optional(),
     maxCount: Joi.number().optional(),
+    femaleCount: Joi.number().optional(),
+    maleCount: Joi.number().optional(),
 });
 
 module.exports = [
@@ -56,7 +60,9 @@ module.exports = [
                     address: Joi.string().optional(),
                     phone: Joi.string().optional(),
                     maxCount: Joi.number().optional(),
-                    populate: Joi.array().items(Joi.string().trim().valid('contacts')).optional()
+                    populate: Joi.array().items(Joi.string().trim().valid('contacts')).optional(),
+                    femaleCount: Joi.number().optional(),
+                    maleCount: Joi.number().optional()
                 }).optional(),
                 failAction: UnFx.failAction
             },

@@ -6,6 +6,8 @@ const AddressSchema = new mongoose.Schema({
     phone: { type: String },
     color: { type: String },
     maxCount: { type: Number },
+    femaleCount: { type: Number },
+    maleCount: { type: Number },
 });
 
 module.exports = mongoose.model('Address', AddressSchema);

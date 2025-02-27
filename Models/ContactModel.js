@@ -8,6 +8,10 @@ const ContactSchema = new mongoose.Schema({
     email: { type: String },
     city: { type: String },
     church: { type: String },
+    sex: {
+        type: String,
+        enum: ['M', 'F'],
+    },
     eatDays: { 
         Fr: Boolean,
         Sa: Boolean,
