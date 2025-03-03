@@ -26,22 +26,22 @@ const contactValidation = Joi.object({
 })
 
 const contactOptionalValidation = Joi.object({
-    fullName: Joi.string().optional(),
-    age: Joi.string().optional(),
-    phone: Joi.string().optional(),
+    fullName: Joi.string().optional().allow('', null),
+    age: Joi.string().optional().allow('', null),
+    phone: Joi.string().optional().allow('', null),
     needAccommodation: Joi.boolean().optional(),
-    email: Joi.string().email().optional(),
-    city: Joi.string().optional(),
-    church: Joi.string().optional(),
-    sex: Joi.string().valid('M','F').optional(),
+    email: Joi.string().email().optional().allow('', null),
+    city: Joi.string().optional().allow('', null),
+    church: Joi.string().optional().allow('', null),
+    sex: Joi.string().valid('M','F').optional().allow('', null),
     eatDays: Joi.object({
         Fr: Joi.boolean(),
         Sa: Joi.boolean()
-    }).optional(),
-    location: Joi.objectId().optional(),
+    }).optional().allow(null),
+    location: Joi.objectId().optional().allow(null),
     arrived: Joi.boolean().optional(),
     paid: Joi.boolean().optional(),
-    chatId: Joi.number().optional()
+    chatId: Joi.number().optional().allow('', null)
 })
 
 module.exports = [

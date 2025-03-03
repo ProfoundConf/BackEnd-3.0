@@ -8,8 +8,8 @@ const { UnFx } = require('../Other/constants')
 
 const addressValidation = Joi.object({
     address: Joi.string().required(),
-    phone: Joi.string().required(),
-    maxCount: Joi.number().required(),
+    phone: Joi.string().optional(),
+    maxCount: Joi.number().optional(),
     color: Joi.string().optional(),
     name: Joi.string().optional(),
     femaleCount: Joi.number().optional(),
@@ -17,13 +17,13 @@ const addressValidation = Joi.object({
 });
 
 const addressOptionalValidation = Joi.object({
-    address: Joi.string().optional(),
-    phone: Joi.string().optional(),
-    color: Joi.string().optional(),
-    maxCount: Joi.number().optional(),
-    name: Joi.string().optional(),
-    femaleCount: Joi.number().optional(),
-    maleCount: Joi.number().optional(),
+    address: Joi.string().optional().allow('', null),
+    phone: Joi.string().optional().allow('', null),
+    color: Joi.string().optional().allow('', null),
+    maxCount: Joi.number().optional().allow(null),
+    name: Joi.string().optional().allow('',null),
+    femaleCount: Joi.number().optional().allow(null),
+    maleCount: Joi.number().optional().allow(null),
 });
 
 module.exports = [
