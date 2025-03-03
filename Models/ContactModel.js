@@ -26,4 +26,4 @@ const ContactSchema = new mongoose.Schema({
     chatId: { type: Number }
 });
 
-module.exports = mongoose.model('Contact', ContactSchema);
+module.exports = mongoose.model('ContactsNew', ContactSchema);

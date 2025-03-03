@@ -7,6 +7,7 @@ const AddressSchema = new mongoose.Schema({
     color: { type: String },
     maxCount: { type: Number },
     femaleCount: { type: Number },
+    name: { type: String },
     maleCount: { type: Number },
 });
 

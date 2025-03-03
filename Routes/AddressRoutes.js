@@ -11,6 +11,7 @@ const addressValidation = Joi.object({
     phone: Joi.string().required(),
     maxCount: Joi.number().required(),
     color: Joi.string().optional(),
+    name: Joi.string().optional(),
     femaleCount: Joi.number().optional(),
     maleCount: Joi.number().optional(),
 });
@@ -20,6 +21,7 @@ const addressOptionalValidation = Joi.object({
     phone: Joi.string().optional(),
     color: Joi.string().optional(),
     maxCount: Joi.number().optional(),
+    name: Joi.string().optional(),
     femaleCount: Joi.number().optional(),
     maleCount: Joi.number().optional(),
 });
@@ -59,6 +61,7 @@ module.exports = [
                 query: Joi.object({
                     address: Joi.string().optional(),
                     phone: Joi.string().optional(),
+                    name: Joi.string().optional(),
                     maxCount: Joi.number().optional(),
                     populate: Joi.array().items(Joi.string().trim().valid('contacts')).optional(),
                     femaleCount: Joi.number().optional(),

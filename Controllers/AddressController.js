@@ -37,6 +37,10 @@ module.exports = {
             if(query.phone){
                 criteriaAll.push({ phone: { $regex: query.phone, $options: 'i' } })
             }
+
+            if(query.name){
+                criteriaAll.push({ name: { $regex: query.name, $options: 'i' } })
+            }
             
             if(query.maxCount){
                 criteriaAll.push({ maxCount: query.maxCount })
