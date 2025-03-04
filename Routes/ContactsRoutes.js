@@ -8,7 +8,7 @@ const { UnFx } = require('../Other/constants')
 
 const contactValidation = Joi.object({
     fullName: Joi.string().required(),
-    age: Joi.string().required(),
+    age: Joi.number().required(),
     phone: Joi.string().required(),
     needAccommodation: Joi.boolean().optional(),
     email: Joi.string().email().required(),
@@ -28,7 +28,7 @@ const contactValidation = Joi.object({
 
 const contactOptionalValidation = Joi.object({
     fullName: Joi.string().optional().allow('', null),
-    age: Joi.string().optional().allow('', null),
+    age: Joi.number().optional().allow(null),
     phone: Joi.string().optional().allow('', null),
     needAccommodation: Joi.boolean().optional(),
     email: Joi.string().email().optional().allow('', null),

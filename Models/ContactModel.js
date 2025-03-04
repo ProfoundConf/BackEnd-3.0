@@ -3,7 +3,7 @@ const ObjectId = require('mongoose').Types.ObjectId
 
 const ContactSchema = new mongoose.Schema({
     fullName: { type: String },
-    age: { type: String },
+    age: { type: Number },
     phone: { type: String },
     email: { type: String },
     city: { type: String },
