@@ -11,7 +11,7 @@ const contactValidation = Joi.object({
     age: Joi.number().required(),
     phone: Joi.string().required(),
     needAccommodation: Joi.boolean().optional(),
-    email: Joi.string().email().required(),
+    email: Joi.string().email().optional(),
     city: Joi.string().required(),
     church: Joi.string().required(),
     sex: Joi.string().valid('M','F').required(),
