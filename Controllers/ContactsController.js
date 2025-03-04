@@ -261,6 +261,12 @@ module.exports = {
                     }
                 }
             }
+            if(payload.age > 30 || payload.age < 15){
+                throw {
+                    statusCode: 403,
+                    message: 'You are not passing age requirements'
+                }
+            }
             const contact = await Services.ContactService.create(payload)
             return { contact: contact }
         } catch(err) {
@@ -298,6 +304,12 @@ module.exports = {
                     statusCode: 403,
                     message: 'Unable to update, location not found!'
                 }
+            }
+        }
+        if(payload.age && (payload.age > 30 || payload.age < 15)){
+            throw {
+                statusCode: 403,
+                message: 'Not passing age requirements'
             }
         }
         const updatedContact = await Services.ContactService.updateOne({ _id: new ObjectId(_id) }, payload)
