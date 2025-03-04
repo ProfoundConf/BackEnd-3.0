@@ -20,6 +20,7 @@ const ContactSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Address'
     },
+    services: [String],
     needAccommodation: { type: Boolean },
     arrived: { type: Boolean },
     paid: { type: Boolean },

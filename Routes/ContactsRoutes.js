@@ -20,6 +20,7 @@ const contactValidation = Joi.object({
         Sa: Joi.boolean()
     }).required(),
     location: Joi.objectId().optional(),
+    services: Joi.array().items(Joi.string()).optional(),
     arrived: Joi.boolean().optional(),
     paid: Joi.boolean().optional(),
     chatId: Joi.number().optional()
@@ -39,6 +40,7 @@ const contactOptionalValidation = Joi.object({
         Sa: Joi.boolean()
     }).optional().allow(null),
     location: Joi.objectId().optional().allow(null),
+    services: Joi.array().items(Joi.string()).optional(),
     arrived: Joi.boolean().optional(),
     paid: Joi.boolean().optional(),
     chatId: Joi.number().optional().allow('', null)
