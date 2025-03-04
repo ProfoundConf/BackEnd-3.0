@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon server.js",
     "start:ngrok": "node scripts/start-ngrok.js",
-    "start:prod": "nodemon server.js"
+    "start:prod": "nodemon server.js",
+    "start:telegram": "nodemon ./Routes/TelegramRoute.js"
   },
   "keywords": [],
   "author": "",
