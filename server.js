@@ -16,7 +16,7 @@ dotenv.config()
 const { RAILWAY_PUBLIC_DOMAIN: API_PATH, API_HOST, MONGODB_PATH, NODE_ENV } = process.env
 
 const routes = require('./Routes/index')
-if(process.env.NODE_ENV !== 'LOCAL'){
+if(process.env.NODE_ENV !== 'LOCAL' || process.env.START_TELEGRAM){
     const telegram = require('./Routes/TelegramRoute')
 }
 
@@ -36,6 +36,7 @@ const init = async () => {
     });
 
     registerAuth(server)
+    await server.register(Inert);
 
     const swaggerOptions = {
         info: {
@@ -58,6 +59,18 @@ const init = async () => {
             return h.response(responseText).type('text/html');
         }
     });
+
+    // server.route({
+    //     method: 'GET',
+    //     path: '/{param*}',  // This will match any URL
+    //     handler: {
+    //         directory: {
+    //             path: './',  // Path to the directory with static files
+    //             listing: true,      // Enable directory listing
+    //             index: ['cat.jpg'],  // Default file when accessing the directory
+    //         },
+    //     },
+    // });
 
     await server.register([
         Inert,
