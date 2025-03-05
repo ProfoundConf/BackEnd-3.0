@@ -9,6 +9,6 @@ const AddressSchema = new mongoose.Schema({
     femaleCount: { type: Number },
     name: { type: String },
     maleCount: { type: Number },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Address', AddressSchema);
