@@ -67,6 +67,9 @@ module.exports = {
                 const qrDataUrl = await QRCode.toDataURL(`http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST || ''}/admin/${contact._id.toString()}/ticket`)
                 contact._qr = qrDataUrl
             }
+            if(populate.includes('allCount')){
+                contact._allCount = (await Services.ContactService.get({}, { _id: 1 }))?.length || 0
+            }
     
             return { contact: contact }
         } catch(err) {

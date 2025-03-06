@@ -61,11 +61,10 @@ module.exports = [
                     _id: Joi.objectId().required()
                 }),
                 query: Joi.object({
-                    populate: Joi.array().items(Joi.string().trim().valid('location','sendQr')).optional(),
+                    populate: Joi.array().items(Joi.string().trim().valid('location','sendQr','allCount')).optional(),
                 }).optional(),
                 failAction: UnFx.failAction
             },
-            auth: 'jwt'
         }
     },
     {
