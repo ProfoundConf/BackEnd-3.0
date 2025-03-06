@@ -61,7 +61,7 @@ module.exports = [
                     _id: Joi.objectId().required()
                 }),
                 query: Joi.object({
-                    populate: Joi.array().items(Joi.string().trim().valid('location')).optional()
+                    populate: Joi.array().items(Joi.string().trim().valid('location','sendQr')).optional(),
                 }).optional(),
                 failAction: UnFx.failAction
             },

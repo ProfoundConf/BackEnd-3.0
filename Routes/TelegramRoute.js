@@ -22,12 +22,19 @@ bot.onText(/\/start/, (msg) => {
   });
 });
 
-async function generateImageFromHTML(htmlContent, outputPath) {
+async function generateImageFromHTML(outputPath, url) {
   const browser = await puppeteer.launch({ headless: false});
+
   const page = await browser.newPage();
 
+  await page.goto(url, { waitUntil: 'networkidle0' });
+  await page.setViewport({
+    width: 360,
+    height: 627
+  })
+
   // Set the HTML content
-  await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+  // await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
   // Take a screenshot
   await page.screenshot({ path: outputPath, fullPage: true });
@@ -41,7 +48,7 @@ bot.on('contact', async (msg) => {
   phoneNumber = phoneNumber.replace(/\D/g, '');
 
   try {
-    let test = await Services.ContactService.aggregate([ {$match: {}} ])
+    // let test = await Services.ContactService.aggregate([ {$match: {}} ])
     // Check if the user already exists in the database
     let user = await Services.ContactService.getOne({ phone: phoneNumber });
 
@@ -59,45 +66,15 @@ bot.on('contact', async (msg) => {
         }
     )
 
-    // const htmlResponse = `
-    //     <b>Інформація</b>
-    //     <b>Унікальний ID:</b> ${user._id}
-    //     <b>Ім'я:</b> ${user.fullName}
-    //     <b>Телефон:</b> ${user.phone}
-    // `;
+    let filePath = `./${user._id.toString()}_download.jpg`
+    let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST}/ticket/${user._id}`
 
-    let filePath = './download.jpg'
-    const imagePath = path.resolve(__dirname, '../cat.jpg')
-    const fileUrl = `file://${imagePath.replace(/\\/g, '/')}`;
+    await generateImageFromHTML(filePath, url)
 
-    const htmlContent = `
-    <html>
-    <head>
-      <style>
-          body {
-              width: 486px;
-              height: 920px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              font-family: Arial, sans-serif;
-              background: url('${fileUrl}') no-repeat center center;
-              background-size: cover;
-          }
-      </style>
-    </head>
-    <body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial;">
-        <h1 style="color: blue;">Hello, Telegram!</h1>
-    </body>
-    </html>
-  `;
+    await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: 'TEST!'})
 
-    await generateImageFromHTML(htmlContent, filePath)
-
-    bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: 'TEST!'})
+    fs.unlink(filePath, () => {})
     
-    // // Send data back as HTML
-    // bot.sendMessage(chatId, htmlResponse, { parse_mode: 'HTML' });
   } catch (error) {
     console.error('Error processing contact:', error);
     bot.sendMessage(chatId, 'Помилка при обробці контакту, спробуй ще раз пізніше, або запитай у наших адмінів');

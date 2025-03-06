@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken')
 const { UnFx, constants } = require('../Other/constants')
 const ObjectId = require('mongoose').Types.ObjectId
 
+const QRCode = require('qrcode');
+
 const freeAddresses = [
     {
         $lookup: {
@@ -46,21 +48,31 @@ const contactsNeedAccommodationCriteria = [
 
 module.exports = {
     getContactById: async(req) => {
-        const { _id } = req.params
-        const populate = req.query?.populate || []
-        const contact = await Services.ContactService.getById(_id)
-        if(!contact){
-            throw {
-                statusCode: 404,
-                message: 'Contact not found!'
+        try{
+            const { _id } = req.params
+            const populate = req.query?.populate || []
+            const contact = await Services.ContactService.getById(_id)
+            if(!contact){
+                throw {
+                    statusCode: 404,
+                    message: 'Contact not found!'
+                }
             }
+    
+            if(populate.includes('location')){
+                contact._location = await Services.AddressService.getById(contact.location)
+            }
+    
+            if(populate.includes('sendQr')){
+                const qrDataUrl = await QRCode.toDataURL(`http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST || ''}/admin/${contact._id.toString()}/ticket`)
+                contact._qr = qrDataUrl
+            }
+    
+            return { contact: contact }
+        } catch(err) {
+            console.log(err)
+            throw err
         }
-
-        if(populate.includes('location')){
-            contact._location = await Services.AddressService.getById(contact.location)
-        }
-
-        return { contact: contact }
     },
     getContactsForLiving: async(req) => {
         try{
