@@ -4,6 +4,11 @@ const jwt = require('jsonwebtoken')
 const { UnFx, constants } = require('../Other/constants')
 const ObjectId = require('mongoose').Types.ObjectId
 
+
+const LiqPay = require('../Other/liqpay')
+
+var liqpay = new LiqPay(process.env.LIQPAY_PUBLIC, process.env.LIQPAY_PRIVATE);
+
 const QRCode = require('qrcode');
 
 const freeAddresses = [
@@ -64,7 +69,7 @@ module.exports = {
             }
     
             if(populate.includes('sendQr')){
-                const qrDataUrl = await QRCode.toDataURL(`http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST || ''}/admin/${contact._id.toString()}/ticket`)
+                const qrDataUrl = await QRCode.toDataURL(`http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST || ''}/admin/ticket/${contact._id.toString()}`)
                 contact._qr = qrDataUrl
             }
             if(populate.includes('allCount')){
@@ -305,7 +310,20 @@ module.exports = {
                 }
             }
             const contact = await Services.ContactService.create(payload)
-            return { contact: contact }
+
+            var html = liqpay.cnb_form({
+                'action'         : 'pay',
+                'amount'         : '1',
+                'currency'       : 'UAH',
+                'description'    : `Квиток на конференцію для ${contact.name}`,
+                'order_id'       : new ObjectId(),
+                'version'        : '3',
+                'result_url': `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST || ''}/ticket/${contact._id.toString()}`,
+                'server_url': 'https://backend-30-production.up.railway.app/contacts/paid/'+contact._id
+            });
+
+
+            return { contact: contact, html }
         } catch(err) {
             console.log(err)
             throw err
@@ -369,5 +387,9 @@ module.exports = {
             console.log(err)
             throw err
         }
+    },
+    payContact: async(req) => {
+        console.log(req.payload)
+        console.log(req.params)
     }
 }

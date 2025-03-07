@@ -204,4 +204,15 @@ module.exports = [
             auth: 'jwt'
         }
     },
+    {
+        method: 'POST',
+        path: '/contacts/paid/{_id}',
+        handler: async(req, h) => ContactsController.payContact(req)
+        .then(res => UnFx.sendSuccess(res, h))
+        .catch(err => UnFx.sendError(err, h)),
+        options: {
+            description: 'payContact',
+            tags: ['api', 'contacts', 'create'],
+        }
+    },
 ]
