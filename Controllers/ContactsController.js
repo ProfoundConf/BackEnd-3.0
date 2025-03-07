@@ -88,9 +88,7 @@ module.exports = {
                 {
                     $match: {
                         'needAccommodation': true,
-                        // 'location': {
-                        //     $exists: false
-                        // }
+                        'paid': true
                     }
                 },
                 {
@@ -138,6 +136,7 @@ module.exports = {
                 {
                     $match: {
                         'needAccommodation': true,
+                        'paid': true,
                         'location': {
                             $exists: false
                         }
@@ -171,7 +170,13 @@ module.exports = {
             const query = { ...req.query } || {}
             const populate = req?.query?.populate || []
 
-            const criteriaAll = []
+            const criteriaAll = [
+                {
+                    $match: {
+                        'paid': true
+                    }
+                }
+            ]
     
             if (query.name) criteriaAll.push({ $match: { fullName: { $regex: query.name, $options: 'i' } } });
 
@@ -296,7 +301,7 @@ module.exports = {
 
                 let contactsNeedAccommodation = (await Services.ContactService.aggregate(contactsNeedAccommodationCriteria))?.[0]?.count || 0
 
-                if(contactsNeedAccommodation >= freeSpaces){
+                if(contactsNeedAccommodation >= 90){
                     throw  {
                         statusCode: 403,
                         message: 'Maximum accommodation limit reached'
@@ -341,16 +346,16 @@ module.exports = {
 
         const payload = req.payload
         if(payload.needAccommodation){
-            let freeSpaces = (await Services.AddressService.aggregate(freeAddresses))?.[0]?.totalFreeSpots || 0
+            // let freeSpaces = (await Services.AddressService.aggregate(freeAddresses))?.[0]?.totalFreeSpots || 0
 
-            let contactsNeedAccommodation = (await Services.ContactService.aggregate(contactsNeedAccommodationCriteria))?.[0]?.count || 0
+            // let contactsNeedAccommodation = (await Services.ContactService.aggregate(contactsNeedAccommodationCriteria))?.[0]?.count || 0
 
-            if(contactsNeedAccommodation >= freeSpaces){
-                throw  {
-                    statusCode: 403,
-                    message: 'Maximum accommodation limit reached'
-                }
-            }
+            // if(contactsNeedAccommodation >= freeSpaces){
+            //     throw  {
+            //         statusCode: 403,
+            //         message: 'Maximum accommodation limit reached'
+            //     }
+            // }
         }
         if(payload.location){
             let locationExists = await Services.AddressService.getById(payload.location)
