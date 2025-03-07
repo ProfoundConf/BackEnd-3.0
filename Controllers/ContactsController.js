@@ -83,9 +83,9 @@ module.exports = {
                 {
                     $match: {
                         'needAccommodation': true,
-                        'location': {
-                            $exists: false
-                        }
+                        // 'location': {
+                        //     $exists: false
+                        // }
                     }
                 },
                 {
