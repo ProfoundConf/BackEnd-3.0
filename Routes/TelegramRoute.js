@@ -38,7 +38,7 @@ async function generateImageFromHTML(outputPath, url) {
 
   // Take a screenshot
   await page.screenshot({ path: outputPath, fullPage: true });
-  // await browser.close();
+  await browser.close();
 }
 
 // Handle received phone number
@@ -71,7 +71,7 @@ bot.on('contact', async (msg) => {
 
     await generateImageFromHTML(filePath, url)
 
-    await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: 'TEST!'})
+    await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: 'Ось твій квиток, покажи його на реєстрації'})
 
     fs.unlink(filePath, () => {})
     
