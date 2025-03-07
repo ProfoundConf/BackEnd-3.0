@@ -69,7 +69,7 @@ module.exports = {
             }
     
             if(populate.includes('sendQr')){
-                const qrDataUrl = await QRCode.toDataURL(`http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST || ''}/admin/ticket/${contact._id.toString()}`)
+                const qrDataUrl = await QRCode.toDataURL(`http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/admin/ticket/${contact._id.toString()}`)
                 contact._qr = qrDataUrl
             }
             if(populate.includes('allCount')){
@@ -318,7 +318,7 @@ module.exports = {
                 'description'    : `Квиток на конференцію для ${contact.name}`,
                 'order_id'       : new ObjectId(),
                 'version'        : '3',
-                'result_url': `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST || ''}/ticket/${contact._id.toString()}`,
+                'result_url': `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${contact._id.toString()}`,
                 'server_url': 'https://backend-30-production.up.railway.app/contacts/paid/'+contact._id
             });
 
