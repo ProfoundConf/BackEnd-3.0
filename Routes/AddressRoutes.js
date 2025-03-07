@@ -17,6 +17,10 @@ const addressValidation = Joi.object({
 });
 
 const addressOptionalValidation = Joi.object({
+    _id: Joi.objectId().optional().allow('',null),
+    createdAt: Joi.string().optional().allow('', null),
+    updatedAt: Joi.string().optional().allow('', null),
+    __v: Joi.number().optional().allow(null),
     address: Joi.string().optional().allow('', null),
     phone: Joi.string().optional().allow('', null),
     color: Joi.string().optional().allow('', null),
