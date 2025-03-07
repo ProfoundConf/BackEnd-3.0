@@ -320,7 +320,7 @@ module.exports = {
                 'action'         : 'pay',
                 'amount'         : '1',
                 'currency'       : 'UAH',
-                'description'    : `Квиток на конференцію для ${contact.name}`,
+                'description'    : `Квиток на конференцію для ${contact.fullName}`,
                 'order_id'       : new ObjectId(),
                 'version'        : '3',
                 'result_url': `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${contact._id.toString()}`,
