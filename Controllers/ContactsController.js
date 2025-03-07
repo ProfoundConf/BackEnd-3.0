@@ -127,6 +127,28 @@ module.exports = {
             throw err
         }
     },
+    getContactsForLivingCount: async(req) => {
+        try{
+            const criteria = [
+                {
+                    $match: {
+                        'needAccommodation': true,
+                        'location': {
+                            $exists: false
+                        }
+                    }
+                },
+                {
+                    $count: 'count'
+                }
+            ]
+            const count = (await Services.ContactService.aggregate(criteria))?.[0]?.count
+
+            return { count: count }
+        }catch(err){
+            throw err
+        }
+    },
     getChurchesByCity: async(req) => {
         try{
             const { city } = req.query

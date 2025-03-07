@@ -81,6 +81,17 @@ module.exports = [
     },
     {
         method: 'GET',
+        path: '/contacts/for-living-count',
+        handler: async(req, h) => ContactsController.getContactsForLivingCount(req)
+        .then(res => UnFx.sendSuccess(res, h))
+        .catch(err => UnFx.sendError(err, h)),
+        options: {
+            description: 'Get Contact who need accommodation count',
+            tags: ['api', 'contacts', 'get', 'accommodation'],
+        }
+    },
+    {
+        method: 'GET',
         path: '/contacts/churches-by-city',
         handler: async(req, h) => ContactsController.getChurchesByCity(req)
         .then(res => UnFx.sendSuccess(res, h))
