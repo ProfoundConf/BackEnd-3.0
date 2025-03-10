@@ -22,12 +22,12 @@ bot.onText(/\/start/, (msg) => {
   });
 });
 
-async function generateImageFromHTML(outputPath, url) {
+async function getUserTicket(outputPath, ticketFrontUrl) {
   const browser = await puppeteer.launch({ headless: false});
 
   const page = await browser.newPage();
 
-  await page.goto(url, { waitUntil: 'networkidle0' });
+  await page.goto(ticketFrontUrl, { waitUntil: 'networkidle0' });
   await page.setViewport({
     width: 360,
     height: 627
@@ -50,31 +50,43 @@ bot.on('contact', async (msg) => {
   try {
     // let test = await Services.ContactService.aggregate([ {$match: {}} ])
     // Check if the user already exists in the database
-    let user = await Services.ContactService.getOne({ phone: phoneNumber });
+    let users = await Services.ContactService.get({ phone: phoneNumber });
 
-    if (!user) {
-      bot.sendMessage(chatId, 'Я не зміг нічого знайти. Якщо ти насправді реєструвався через наш сайт, запитай допомоги у адмінів.');
+    if (!users.length) {
+      let siteUrl = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}`
+      bot.sendMessage(chatId, `Я не зміг нічого знайти. Якщо ти насправді реєструвався через наш <a href="${siteUrl}">сайт</a>, запитай допомоги у адмінів.`, {
+        parse_mode: 'HTML'
+      });
       return { data: true }
     }
 
-    await Services.ContactService.updateOne(
-        {
-            _id: user._id
-        },
-        {
-            chatId: chatId
-        }
-    )
+    for(let user of users){
+      await Services.ContactService.updateOne(
+          {
+              _id: user._id
+          },
+          {
+              chatId: chatId
+          }
+      )
 
-    let filePath = `./${user._id.toString()}_download.jpg`
-    let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST}/ticket/${user._id}`
+      if(!user.paid){
+        bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим посиланням`, {
+          parse_mode: 'HTML'
+        });
+        continue
+      }
+      let filePath = `./${user._id.toString()}_download.jpg`
+      let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST}/ticket/${user._id}`
 
-    await generateImageFromHTML(filePath, url)
+      await getUserTicket(filePath, url)
 
-    await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: 'Ось твій квиток, покажи його на реєстрації'})
+      await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? user.fullName : ''}, покажи його на реєстрації`})
 
-    fs.unlink(filePath, () => {})
-    
+      fs.unlink(filePath, () => {})
+    }
+
+    return { data: true }
   } catch (error) {
     console.error('Error processing contact:', error);
     bot.sendMessage(chatId, 'Помилка при обробці контакту, спробуй ще раз пізніше, або запитай у наших адмінів');
