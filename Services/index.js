@@ -3,5 +3,6 @@ module.exports = {
     AuthTokenService: require("./AuthTokenService"),
     AdminService: require("./AdminService"),
     AddressService: require("./AddressService"),
-    OldContactService: require("./OldContactsService")
+    OldContactService: require("./OldContactsService"),
+    PaymentService: require('./PaymentService')
 }

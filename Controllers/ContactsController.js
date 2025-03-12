@@ -316,17 +316,19 @@ module.exports = {
             }
             const contact = await Services.ContactService.create(payload)
 
+
+            const payment = await Services.PaymentService.create({ contactId: contact._id })
+
             var html = liqpay.cnb_form({
                 'action'         : 'pay',
                 'amount'         : '1',
                 'currency'       : 'UAH',
                 'description'    : `Квиток на конференцію для ${contact.fullName}`,
-                'order_id'       : new ObjectId(),
+                'order_id'       :  payment._id,
                 'version'        : '3',
                 'result_url': `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${contact._id.toString()}`,
-                'server_url': 'https://backend-30-production.up.railway.app/contacts/paid/'+contact._id
+                'server_url': 'https://e9c1-152-89-22-92.ngrok-free.app/contacts/paid/'+payment._id
             });
-
 
             return { contact: contact, html }
         } catch(err) {
@@ -394,7 +396,29 @@ module.exports = {
         }
     },
     payContact: async(req) => {
-        console.log(req.payload)
-        console.log(req.params)
+        try{
+            const data = await liqpay.api("request", {
+                "action"   : "status",
+                "version"  : "3",
+                "order_id" : req.params._id
+                });
+            
+            await Services.PaymentService.updateOne({_id: req.params._id}, data)
+    
+            const payment = await Services.PaymentService.getById(req.params._id)  
+
+            if(payment.status == 'success') {
+                await Services.ContactService.updateOne({ _id: new ObjectId(payment.contactId) }, { paid: true })
+                const contact = await Services.ContactService.getById(payment.contactId)
+
+                // Send to Telegram Ticket (For Bond)
+            }
+            
+            return { payment: payment }
+        }catch(err){
+            console.log(err)
+            throw err
+        }
+        
     }
 }
