@@ -22,6 +22,54 @@ bot.onText(/\/start/, (msg) => {
   });
 });
 
+
+bot.onText(/\/get_ticket/, async(msg) => {
+  const chatId = msg.chat.id;
+
+  let mainUser = await Services.ContactService.getOne({ chatId: chatId });
+
+  if(!mainUser){
+    bot.sendMessage(chatId, `Схоже ти ще не зареєструвався, або не заплатив, пройди оплату на нашому сайті, якщо хочеш отримати квиток в перший раз`);
+    return { data: true}
+  }
+
+  let users = await Services.ContactService.get({ phone: mainUser.phone });
+
+  if (!users.length) {
+    let siteUrl = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}`
+    bot.sendMessage(chatId, `Я не зміг нічого знайти. Якщо ти насправді реєструвався через наш <a href="${siteUrl}">сайт</a>, запитай допомоги у адмінів.`, {
+      parse_mode: 'HTML'
+    });
+    return { data: true }
+  }
+
+  for(let user of users){
+    await Services.ContactService.updateOne(
+        {
+            _id: user._id
+        },
+        {
+            chatId: chatId
+        }
+    )
+
+    if(!user.paid){
+      bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим посиланням`, {
+        parse_mode: 'HTML'
+      });
+      continue
+    }
+    let filePath = `./${user._id.toString()}_download.jpg`
+    let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST}/ticket/${user._id}`
+
+    await getUserTicket(filePath, url)
+
+    await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації`})
+
+    fs.unlink(filePath, () => {})
+  }
+});
+
 async function getUserTicket(outputPath, ticketFrontUrl) {
   const browser = await puppeteer.launch({ headless: false});
 
@@ -82,7 +130,7 @@ bot.on('contact', async (msg) => {
 
       await getUserTicket(filePath, url)
 
-      await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? user.fullName : ''}, покажи його на реєстрації`})
+      await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації`})
 
       fs.unlink(filePath, () => {})
     }
@@ -93,3 +141,8 @@ bot.on('contact', async (msg) => {
     bot.sendMessage(chatId, 'Помилка при обробці контакту, спробуй ще раз пізніше, або запитай у наших адмінів');
   }
 });
+
+module.exports = {
+  getUserTicket,
+  bot
+}

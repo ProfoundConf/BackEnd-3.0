@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { UnFx, constants } = require('../Other/constants')
 const ObjectId = require('mongoose').Types.ObjectId
+const { bot, getUserTicket } = require('../Routes/TelegramRoute')
 
 
 const LiqPay = require('../Other/liqpay')
@@ -411,7 +412,35 @@ module.exports = {
                 await Services.ContactService.updateOne({ _id: new ObjectId(payment.contactId) }, { paid: true })
                 const contact = await Services.ContactService.getById(payment.contactId)
 
-                // Send to Telegram Ticket (For Bond)
+                if(contact.chatId){
+                    let users = await Services.ContactService.get({ phone: contact.phone });
+                
+                    if (users.length) {
+                        for(let user of users){
+                            await Services.ContactService.updateOne(
+                                {
+                                    _id: user._id
+                                },
+                                {
+                                    chatId: contact.chatId
+                                }
+                            )
+                        
+                            if(user.paid){
+                                let filePath = `./${user._id.toString()}_download.jpg`
+                                let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST}/ticket/${user._id}`
+                            
+                                await getUserTicket(filePath, url)
+                            
+                                await bot.sendPhoto(contact.chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації`})
+                            
+                                fs.unlink(filePath, () => {})
+                            }
+                        }
+                    }
+
+                }
+                
             }
             
             return { payment: payment }
