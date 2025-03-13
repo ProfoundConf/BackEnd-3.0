@@ -30,14 +30,15 @@ async function getUserTicket(outputPath, ticketFrontUrl) {
   await page.goto(ticketFrontUrl, { waitUntil: 'networkidle0' });
   await page.setViewport({
     width: 360,
-    height: 627
+    height: 627,
+    deviceScaleFactor: 2
   })
 
   // Set the HTML content
   // await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
   // Take a screenshot
-  await page.screenshot({ path: outputPath, fullPage: true });
+  await page.screenshot({ path: outputPath, fullPage: true, type: 'jpeg', quality: 100 });
   await browser.close();
 }
 
