@@ -24,7 +24,11 @@ const ContactSchema = new mongoose.Schema({
     needAccommodation: { type: Boolean },
     arrived: { type: Boolean },
     paid: { type: Boolean },
-    chatId: { type: Number }
+    chatId: { type: Number },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('ContactsNew', ContactSchema);

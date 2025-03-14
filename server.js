@@ -20,6 +20,7 @@ if(process.env.NODE_ENV !== 'LOCAL' || process.env.START_TELEGRAM){
     const telegram = require('./Routes/TelegramRoute')
 }
 
+require('./Other/Cron')
 
 const init = async () => {
     // Create a new Hapi server instance

@@ -3,7 +3,14 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { UnFx, constants } = require('../Other/constants')
 const ObjectId = require('mongoose').Types.ObjectId
-const { bot, getUserTicket } = require('../Routes/TelegramRoute')
+let bot;
+let getUserTicket;
+
+if(process.env.NODE_ENV !== 'LOCAL' || process.env.START_TELEGRAM){
+    let telegram = require('../Routes/TelegramRoute')
+    bot = telegram.bot
+    getUserTicket = telegram.getUserTicket
+}
 
 
 const LiqPay = require('../Other/liqpay')
@@ -430,11 +437,13 @@ module.exports = {
                                 let filePath = `./${user._id.toString()}_download.jpg`
                                 let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST}/ticket/${user._id}`
                             
-                                await getUserTicket(filePath, url)
+                                if(bot){
+                                    await getUserTicket(filePath, url)
                             
-                                await bot.sendPhoto(contact.chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації`})
-                            
-                                fs.unlink(filePath, () => {})
+                                    await bot.sendPhoto(contact.chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації`})
+                                
+                                    fs.unlink(filePath, () => {})
+                                }
                             }
                         }
                     }
