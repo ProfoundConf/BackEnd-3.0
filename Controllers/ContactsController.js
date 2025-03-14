@@ -335,7 +335,7 @@ module.exports = {
                 'order_id'       :  payment._id,
                 'version'        : '3',
                 'result_url': `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${contact._id.toString()}`,
-                'server_url': 'https://e9c1-152-89-22-92.ngrok-free.app/contacts/paid/'+payment._id
+                'server_url': (process.env.NODE_ENV !== 'LOCAL' ? 'https://backend-30-production.up.railway.app/contacts/paid/' : 'https://e9c1-152-89-22-92.ngrok-free.app/contacts/paid/') + payment._id
             });
 
             return { contact: contact, html }
