@@ -382,6 +382,14 @@ module.exports = {
                 message: 'Not passing age requirements'
             }
         }
+        // If he is no accomodation -> send info about it after he is arrived
+        if(payload.arrived && !contact.arrived && bot && contact.chatId && contact.location) {
+            const locationObj = await Services.AddressService.getById(contact.location)
+            if(locationObj){
+                bot.sendMessage(contact.chatId, `Вітаю на профаунді!\n\nОсь дані про твоє заселення: \nАдреса: ${locationObj.address}\nКолір: ${locationObj.color}`)
+            }
+        }
+    
         const updatedContact = await Services.ContactService.updateOne({ _id: new ObjectId(_id) }, payload)
         return { contact: updatedContact }
     },
