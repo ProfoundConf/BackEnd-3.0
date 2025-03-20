@@ -302,12 +302,6 @@ module.exports = {
         }
     },
     createContact: async(req) => {
-        if(true){
-            throw {
-                statusCode: 403,
-                message: 'Ще не час'
-            }
-        }
         try{
             const payload = req.payload
             if(payload.needAccommodation){
