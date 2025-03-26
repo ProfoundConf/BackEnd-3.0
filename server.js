@@ -109,7 +109,7 @@ const init = async () => {
     // Інтеграція Socket.IO через серверний listener
     const io = socketIo(server.listener, {
         cors: {
-            origin: ["http://localhost:4200"],
+            origin: ["http://localhost:4200", "https://profound-1a19e.web.app", "https://profoundconf.com"],
             methods: ["GET", "POST"],
             allowedHeaders: ["Accept", "Content-Type", "Authorization"],
             credentials: true
