@@ -28,7 +28,8 @@ const ContactSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    promoCode: { type: String }
 }, { timestamps: true });
 
 module.exports = mongoose.model('ContactsNew', ContactSchema);

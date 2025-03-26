@@ -2,15 +2,14 @@
 
 const Hapi = require('@hapi/hapi');
 const dotenv = require('dotenv');
-const mongoose = require('mongoose')
-
+const mongoose = require('mongoose');
 const Inert = require('@hapi/inert');
 const Vision = require('@hapi/vision');
 const HapiSwagger = require('hapi-swagger');
 const Joi = require('joi');
 const Pack = require('./package.json');
 const { registerAuth } = require('./Other/auth')
-
+const socketIo = require('socket.io');
 dotenv.config()
 
 const { RAILWAY_PUBLIC_DOMAIN: API_PATH, API_HOST, MONGODB_PATH, NODE_ENV } = process.env
@@ -87,7 +86,6 @@ const init = async () => {
         return h.continue;
     });
 
-    // Log after the response is sent
     server.ext('onPreResponse', (request, h) => {
         const response = request.response;
         if (response.isBoom) {
@@ -103,16 +101,39 @@ const init = async () => {
     // Start the server
     await server.start();
     console.log('Server running on %s', server.info.uri);
-    // Conecting to mongoDb
-    let mongoRes = await mongoose.connect(MONGODB_PATH)
-    console.log('MongoDB Connected!',mongoRes?.connections?.[0]?._connectionString || '')
+
+    // Підключення до MongoDB
+    let mongoRes = await mongoose.connect(MONGODB_PATH);
+    console.log('MongoDB Connected!', mongoRes?.connections?.[0]?._connectionString || '');
+
+    // Інтеграція Socket.IO через серверний listener
+    const io = socketIo(server.listener, {
+        cors: {
+            origin: ["http://localhost:4200"],
+            methods: ["GET", "POST"],
+            allowedHeaders: ["Accept", "Content-Type", "Authorization"],
+            credentials: true
+        }
+    });
+
+    io.on('connection', (socket) => {
+        console.log('Користувач підключився через сокети');
+
+        // Обробка події зміни кольору
+        socket.on('changeColor', (color) => {
+            // Трансляція повідомлення всім підключеним клієнтам
+            io.emit('changeColor', color);
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Користувач відключився від сокетів');
+        });
+    });
 };
 
-// Handle any errors when starting the server
 process.on('unhandledRejection', (err) => {
     console.log(err);
     process.exit(1);
 });
 
-// Initialize the server
-init()
+init();

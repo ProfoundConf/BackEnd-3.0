@@ -19,6 +19,13 @@ var liqpay = new LiqPay(process.env.LIQPAY_PUBLIC, process.env.LIQPAY_PRIVATE);
 
 const QRCode = require('qrcode');
 
+validPromoCodes = {
+    'BOND69': 20, 
+    'FIRE': 15,
+    'SUMMER': 25,
+    'WELCOME': 10   
+  };
+
 const freeAddresses = [
     {
         $lookup: {
@@ -327,6 +334,20 @@ module.exports = {
 
             const payment = await Services.PaymentService.create({ contactId: contact._id })
 
+            let amount = 700
+
+            if (payload.eatDays.Fr) {
+                amount += 150
+            }
+
+            if (payload.eatDays.Sa) {
+                amount += 150
+            }
+
+            if(payload.promoCode && validPromoCodes[payload?.promoCode?.toUpperCase()]){
+                amount = amount * (1 - validPromoCodes[payload?.promoCode?.toUpperCase()] / 100)
+            }
+
             var html = liqpay.cnb_form({
                 'action'         : 'pay',
                 'amount'         : '1',
@@ -335,7 +356,7 @@ module.exports = {
                 'order_id'       :  payment._id,
                 'version'        : '3',
                 'result_url': `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${contact._id.toString()}`,
-                'server_url': (process.env.NODE_ENV !== 'LOCAL' ? 'https://backend-30-production.up.railway.app/contacts/paid/' : 'https://e9c1-152-89-22-92.ngrok-free.app/contacts/paid/') + payment._id
+                'server_url': (process.env.NODE_ENV !== 'LOCAL' ? 'https://backend-30-production.up.railway.app/contacts/paid/' : 'https://15a1-152-89-22-92.ngrok-free.app/contacts/paid/') + payment._id
             });
 
             return { contact: contact, html }

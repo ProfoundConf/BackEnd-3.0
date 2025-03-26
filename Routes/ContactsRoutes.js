@@ -23,7 +23,8 @@ const contactValidation = Joi.object({
     services: Joi.array().items(Joi.string()).optional(),
     arrived: Joi.boolean().optional(),
     paid: Joi.boolean().optional(),
-    chatId: Joi.number().optional()
+    chatId: Joi.number().optional(),
+    promoCode: Joi.string().optional()
 })
 
 const contactOptionalValidation = Joi.object({
@@ -43,7 +44,8 @@ const contactOptionalValidation = Joi.object({
     services: Joi.array().items(Joi.string()).optional(),
     arrived: Joi.boolean().optional(),
     paid: Joi.boolean().optional(),
-    chatId: Joi.number().optional().allow('', null)
+    chatId: Joi.number().optional().allow('', null),
+    promoCode: Joi.string().optional().allow('', null)
 })
 
 module.exports = [
