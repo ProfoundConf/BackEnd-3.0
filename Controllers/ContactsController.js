@@ -265,8 +265,17 @@ module.exports = {
                     }
                 )
             }
+
+            let sortCriteria = [{ $sort: { 'createdAt': Number(query.dir) || -1 } }]
+            if(query.prop){
+                sortCriteria = [{
+                    $sort: {
+                        [query.prop]: Number(query.dir) || -1
+                    }
+                }]
+            }
     
-            const contacts = await Services.ContactService.aggregate(criteriaAll)
+            const contacts = await Services.ContactService.aggregate([ ...criteriaAll, ...sortCriteria])
             return { contacts: contacts }
         } catch(err) {
             console.log(err)
