@@ -350,7 +350,7 @@ module.exports = {
 
             var html = liqpay.cnb_form({
                 'action'         : 'pay',
-                'amount'         : '1',
+                'amount'         : `${amount}`,
                 'currency'       : 'UAH',
                 'description'    : `Квиток на конференцію для ${contact.fullName}`,
                 'order_id'       :  payment._id,
