@@ -131,6 +131,8 @@ module.exports = [
                     arrived: Joi.boolean().optional(), // Explicitly checking for boolean value
                     needAccommodation: Joi.boolean().optional(),
                     populate: Joi.array().items(Joi.string().trim().valid('location')).optional(),
+                    prop: Joi.string().optional(),
+                    dir: Joi.string().optional()
                 }).optional(),
                 failAction: UnFx.failAction
             },
