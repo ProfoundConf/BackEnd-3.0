@@ -128,6 +128,7 @@ bot.on('contact', async (msg) => {
       let filePath = `./${user._id.toString()}_download.jpg`
       let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${user._id}`
 
+      console.log('URL:', url, user._id)
       await getUserTicket(filePath, url)
 
       await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації`})
