@@ -71,7 +71,10 @@ bot.onText(/\/get_ticket/, async(msg) => {
 });
 
 async function getUserTicket(outputPath, ticketFrontUrl) {
-  const browser = await puppeteer.launch({ headless: false});
+  const browser = await puppeteer.launch({ 
+    headless: false,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
 
   const page = await browser.newPage();
 
