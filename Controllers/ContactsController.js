@@ -21,9 +21,7 @@ const QRCode = require('qrcode');
 
 validPromoCodes = {
     'BOND69': 20, 
-    'FIRE': 15,
-    'SUMMER': 25,
-    'WELCOME': 10   
+    'FIRE': 10,   
   };
 
 const freeAddresses = [
@@ -325,7 +323,7 @@ module.exports = {
 
                 let contactsNeedAccommodation = (await Services.ContactService.aggregate(contactsNeedAccommodationCriteria))?.[0]?.count || 0
 
-                if(contactsNeedAccommodation >= 90){
+                if(contactsNeedAccommodation >= 60){
                     throw  {
                         statusCode: 403,
                         message: 'Maximum accommodation limit reached'
@@ -357,9 +355,10 @@ module.exports = {
                 amount = amount * (1 - validPromoCodes[payload?.promoCode?.toUpperCase()] / 100)
             }
 
+            console.log('AMOUNT:', amount)
             var html = liqpay.cnb_form({
                 'action'         : 'pay',
-                'amount'         : `${amount}`,
+                'amount'         :  `${amount}`,
                 'currency'       : 'UAH',
                 'description'    : `Квиток на конференцію для ${contact.fullName}`,
                 'order_id'       :  payment._id,
