@@ -126,7 +126,7 @@ bot.on('contact', async (msg) => {
         continue
       }
       let filePath = `./${user._id.toString()}_download.jpg`
-      let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST}/ticket/${user._id}`
+      let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${user._id}`
 
       await getUserTicket(filePath, url)
 
