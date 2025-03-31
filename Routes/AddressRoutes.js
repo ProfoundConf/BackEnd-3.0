@@ -86,7 +86,7 @@ module.exports = [
             description: 'Create New Address',
             tags: ['api', 'address', 'create'],
             validate: {
-                payload: addressValidation,
+                payload: addressOptionalValidation,
                 failAction: UnFx.failAction
             },
             auth: 'jwt'
