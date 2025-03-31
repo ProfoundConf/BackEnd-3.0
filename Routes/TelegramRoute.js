@@ -103,9 +103,8 @@ bot.on('contact', async (msg) => {
     // let test = await Services.ContactService.aggregate([ {$match: {}} ])
     // Check if the user already exists in the database
     let users = await Services.ContactService.get({ phone: phoneNumber });
-
+    let siteUrl = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}`
     if (!users.length) {
-      let siteUrl = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}`
       bot.sendMessage(chatId, `Я не зміг нічого знайти. Якщо ти насправді реєструвався через наш <a href="${siteUrl}">сайт</a>, запитай допомоги у адмінів.`, {
         parse_mode: 'HTML'
       });
@@ -123,7 +122,7 @@ bot.on('contact', async (msg) => {
       )
 
       if(!user.paid){
-        bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим посиланням`, {
+        bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим <a href="${siteUrl}">посиланням</a>`, {
           parse_mode: 'HTML'
         });
         continue
