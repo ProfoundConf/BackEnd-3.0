@@ -22,6 +22,7 @@ const QRCode = require('qrcode');
 validPromoCodes = {
     'BOND69': 20, 
     'FIRE': 10,   
+    'PRANK': 15,
   };
 
 const freeAddresses = [
