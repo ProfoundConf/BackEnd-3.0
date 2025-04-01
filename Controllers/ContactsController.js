@@ -323,7 +323,7 @@ module.exports = {
 
                 let contactsNeedAccommodation = (await Services.ContactService.aggregate(contactsNeedAccommodationCriteria))?.[0]?.count || 0
 
-                if(contactsNeedAccommodation >= 60){
+                if(contactsNeedAccommodation >= 70){
                     throw  {
                         statusCode: 403,
                         message: 'Maximum accommodation limit reached'
