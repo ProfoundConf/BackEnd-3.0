@@ -1,18 +1,10 @@
 [phases]
 [phases.setup]
-# Install dependencies needed for the project
-cmds = ["npm install"]
+cmds = [
+    "npm install --omit=dev",
+    "npm install puppeteer --no-save",
+    "apt-get update && apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxrandr2 libxdamage1 libgbm1 libasound2"
+]
 
-[phases.build]
-# Since this is a Node.js app, there's no explicit build step required. This is optional.
-
-[phases.start]
-# The command to start your application
-cmd = "npm start"
-
-[environment]
-# Add environment variables if necessary (like NODE_ENV)
-NODE_ENV = "production"
-
-[static]
-# Add static file paths if you serve them from the backend (optional)
+[start]
+cmd = "npm run start:telegram"
