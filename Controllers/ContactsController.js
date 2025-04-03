@@ -23,6 +23,7 @@ validPromoCodes = {
     'BOND69': 20, 
     'FIRE': 10,   
     'PRANK': 15,
+    'ILOVEBOOTH': 100
   };
 
 const freeAddresses = [
