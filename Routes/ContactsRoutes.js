@@ -28,6 +28,8 @@ const contactValidation = Joi.object({
 })
 
 const contactOptionalValidation = Joi.object({
+    _id: Joi.objectId().optional().allow(null),
+    __v: Joi.number().optional().allow(null),
     fullName: Joi.string().optional().allow('', null),
     age: Joi.number().optional().allow(null),
     phone: Joi.string().optional().allow('', null),
