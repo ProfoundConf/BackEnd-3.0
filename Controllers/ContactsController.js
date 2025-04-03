@@ -378,9 +378,14 @@ module.exports = {
 
             
             console.log('AMOUNT:', amount)
+            if(amount === 0){
+                await Services.ContactService.updateOne({ _id: contact._id }, { paid: true })
+                return { contact: contact, html: null }
+            }
+            
             var html = liqpay.cnb_form({
                 'action'         : 'pay',
-                'amount'         :  `1`,
+                'amount'         :  `${amount}`,
                 'currency'       : 'UAH',
                 'description'    : `Квиток на конференцію для ${contact.fullName}`,
                 'order_id'       :  payment._id,
