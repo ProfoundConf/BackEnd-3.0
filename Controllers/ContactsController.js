@@ -380,7 +380,7 @@ module.exports = {
             console.log('AMOUNT:', amount)
             var html = liqpay.cnb_form({
                 'action'         : 'pay',
-                'amount'         :  `${amount}`,
+                'amount'         :  `1`,
                 'currency'       : 'UAH',
                 'description'    : `Квиток на конференцію для ${contact.fullName}`,
                 'order_id'       :  payment._id,
