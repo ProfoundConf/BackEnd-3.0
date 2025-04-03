@@ -85,6 +85,17 @@ async function getUserTicket(outputPath, ticketFrontUrl) {
     deviceScaleFactor: 2
   })
 
+  await page.evaluate(() => {
+    const btnL = document.querySelector('.btn-back-laptop');
+    if (btnL) {
+      btnL.remove();
+    }
+    const btn = document.querySelector('.btn-back');
+    if (btn) {
+      btnL.remove();
+    }
+  });
+
   // Set the HTML content
   // await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
