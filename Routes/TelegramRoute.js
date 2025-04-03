@@ -133,9 +133,9 @@ bot.on('contact', async (msg) => {
       )
 
       if(!user.paid){
-        bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим <a href="${siteUrl}">посиланням</a>`, {
-          parse_mode: 'HTML'
-        });
+        // bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим <a href="${siteUrl}">посиланням</a>`, {
+        //   parse_mode: 'HTML'
+        // });
         continue
       }
       let filePath = `./${user._id.toString()}_download.jpg`
