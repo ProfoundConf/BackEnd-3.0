@@ -151,7 +151,7 @@ try {
       //   parse_mode: 'HTML'
       // })
 
-      await bot.sendMessage(chatId, `<a href="${url}">Ось твій квиток :)</a>`, {
+      await bot.sendMessage(chatId, `Ось твій квиток :) \n${url}`, {
         parse_mode: 'HTML'
       });
       
@@ -191,7 +191,7 @@ bot.onText(/\/broadcast_tickets/, async (msg) => {
         const url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${user._id}`;
         
         await bot.sendMessage(user.chatId, 
-          `Добрий вечір! \n Вибач, якщо трішки принесли дискомфорт з реєстрацією. Бот трішки налякався від кількості реєстрацій) \n Будь впевнений, що ти зареєструвався. Тримай повторне посилання на квиток: \n<a href="${url}">Відкрити квиток</a>`, {
+          `Добрий вечір!\nВибач, якщо трішки принесли дискомфорт з реєстрацією. Бот трішки налякався від кількості реєстрацій) \nБудь впевнений, що ти зареєструвався. Тримай повторне посилання на квиток: \n${url}`, {
           parse_mode: 'HTML'
         });
         
