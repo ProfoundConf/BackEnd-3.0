@@ -20,7 +20,7 @@ var liqpay = new LiqPay(process.env.LIQPAY_PUBLIC, process.env.LIQPAY_PRIVATE);
 const QRCode = require('qrcode');
 
 validPromoCodes = {
-    'ROMISTROVKA_FOREVER': 50, 
+    'GOODNEWS': 50, 
     'FIRE': 10,   
     'PRANK': 15,
     'ILOVEBOOTH': 100
@@ -56,9 +56,7 @@ const contactsNeedAccommodationCriteria = [
     {
         $match: {
             'needAccommodation': true,
-            'location': {
-                $exists: false
-            }
+            'paid': true
         }
     },
     {
