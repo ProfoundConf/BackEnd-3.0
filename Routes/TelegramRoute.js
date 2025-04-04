@@ -166,54 +166,7 @@ try {
   }
 });
 
-bot.onText(/\/broadcast_tickets/, async (msg) => {
-  const chatId = msg.chat.id;
-  
-  try {
-    // Get all users who have paid
-    const users = await Services.ContactService.get({ paid: true, chatId: { $exists: true } });
-    
-    if (!users.length) {
-      bot.sendMessage(chatId, 'Наразі немає користувачів з оплаченими квитками.');
-      return;
-    } 
 
-    let successCount = 0;
-    let failCount = 0;
-
-    for (let user of users) {
-      if (!user.chatId) {
-        failCount++;
-        continue;
-      }
-
-      try {
-        const url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${user._id}`;
-        
-        await bot.sendMessage(user.chatId, 
-          `Добрий вечір!\nВибач, якщо трішки принесли дискомфорт з реєстрацією. Бот трішки налякався від кількості реєстрацій) \nБудь впевнений, що ти зареєструвався. Тримай повторне посилання на квиток: \n${url}`, {
-          parse_mode: 'HTML'
-        });
-        
-        successCount++;
-      } catch (err) {
-        console.error(`Failed to send message to user ${user._id}:`, err);
-        failCount++;
-      }
-
-      // Add small delay to avoid hitting rate limits
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    bot.sendMessage(chatId, 
-      `Розсилка завершена!\nУспішно відправлено: ${successCount}\nНе вдалося відправити: ${failCount}`
-    );
-
-  } catch (error) {
-    console.error('Error in broadcast:', error);
-    bot.sendMessage(chatId, 'Сталася помилка при виконанні розсилки.');
-  }
-});
 
 module.exports = {
   getUserTicket,
