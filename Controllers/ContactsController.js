@@ -56,9 +56,7 @@ const contactsNeedAccommodationCriteria = [
     {
         $match: {
             'needAccommodation': true,
-            'location': {
-                $exists: false
-            }
+            'paid': true
         }
     },
     {
