@@ -54,7 +54,7 @@ bot.onText(/\/get_ticket/, async(msg) => {
     )
 
     if(!user.paid){
-      bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим посиланням`, {
+      bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName} ` : ''}, але не заплатив. Щоб оплатити перейди за цим посиланням`, {
         parse_mode: 'HTML'
       });
       continue
@@ -62,11 +62,14 @@ bot.onText(/\/get_ticket/, async(msg) => {
     let filePath = `./${user._id.toString()}_download.jpg`
     let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST}/ticket/${user._id}`
 
-    await getUserTicket(filePath, url)
+    // await getUserTicket(filePath, url)
 
-    await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації`})
+    await bot.sendMessage(chatId, `Ось твій квиток ${url}`, {
+      
+    })
+    // await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації`})
 
-    fs.unlink(filePath, () => {})
+    // fs.unlink(filePath, () => {})
   }
 });
 
@@ -109,8 +112,7 @@ bot.on('contact', async (msg) => {
   const chatId = msg.chat.id;
   let phoneNumber = msg.contact.phone_number;
   phoneNumber = phoneNumber.replace(/\D/g, '');
-
-  try {
+try {
     // let test = await Services.ContactService.aggregate([ {$match: {}} ])
     // Check if the user already exists in the database
     let users = await Services.ContactService.get({ phone: phoneNumber });
@@ -133,7 +135,7 @@ bot.on('contact', async (msg) => {
       )
 
       if(!user.paid){
-        // bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим <a href="${siteUrl}">посиланням</a>`, {
+        // bot.sendMessage(chatId, Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName} : ''}, але не заплатив. Щоб оплатити перейди за цим <a href="${siteUrl}">посиланням</a>`, {
         //   parse_mode: 'HTML'
         // });
         continue
