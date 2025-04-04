@@ -9,11 +9,9 @@ const path = require("path")
 const token = process.env.TELEGRAM_KEY;
 const bot = new TelegramBot(token, { polling: true });
 
-// Handle '/start' command
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
   
-  // Send a message asking for the phone number
   bot.sendMessage(chatId, 'Привіт! Надішли свій номер телефону, щоб отримати всю необіхідну інформацію', {
     reply_markup: {
       keyboard: [[{ text: 'Надішли номер', request_contact: true }]],
@@ -36,8 +34,8 @@ bot.onText(/\/get_ticket/, async(msg) => {
   let users = await Services.ContactService.get({ phone: mainUser.phone });
 
   if (!users.length) {
-    let siteUrl = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}`
-    bot.sendMessage(chatId, `Я не зміг нічого знайти. Якщо ти насправді реєструвався через наш <a href="${siteUrl}">сайт</a>, запитай допомоги у адмінів.`, {
+    let siteUrl = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}`;
+    bot.sendMessage(chatId,  `Я не зміг нічого знайти. Якщо ти насправді реєструвався через наш <a href="${siteUrl}">сайт</a>, запитай допомоги у адмінів.`, {
       parse_mode: 'HTML'
     });
     return { data: true }
@@ -54,16 +52,19 @@ bot.onText(/\/get_ticket/, async(msg) => {
     )
 
     if(!user.paid){
-      bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим посиланням`, {
+      bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName} ` : ''} , але не заплатив. Щоб оплатити перейди за цим <a href="${siteUrl}">посиланням</a>`, {
         parse_mode: 'HTML'
       });
       continue
     }
-    let filePath = `./${user._id.toString()}_download.jpg`
-    let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.APP_HOST}/ticket/${user._id}`
+    let filePath = `./${user._id.toString()}_download.jpg`;
+    let siteUrl = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}`;
 
     await getUserTicket(filePath, url)
 
+    await bot.sendMessage(chatId, `Ось твій квиток ${url}`, {
+      
+    })
     await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації`})
 
     fs.unlink(filePath, () => {})
@@ -96,25 +97,19 @@ async function getUserTicket(outputPath, ticketFrontUrl) {
     }
   });
 
-  // Set the HTML content
-  // await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+  await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-  // Take a screenshot
   await page.screenshot({ path: outputPath, fullPage: true, type: 'jpeg', quality: 100 });
   await browser.close();
 }
 
-// Handle received phone number
 bot.on('contact', async (msg) => {
   const chatId = msg.chat.id;
   let phoneNumber = msg.contact.phone_number;
   phoneNumber = phoneNumber.replace(/\D/g, '');
-
-  try {
-    // let test = await Services.ContactService.aggregate([ {$match: {}} ])
-    // Check if the user already exists in the database
+try {
     let users = await Services.ContactService.get({ phone: phoneNumber });
-    let siteUrl = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}`
+    let siteUrl = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}`;
     if (!users.length) {
       bot.sendMessage(chatId, `Я не зміг нічого знайти. Якщо ти насправді реєструвався через наш <a href="${siteUrl}">сайт</a>, запитай допомоги у адмінів.`, {
         parse_mode: 'HTML'
@@ -133,13 +128,13 @@ bot.on('contact', async (msg) => {
       )
 
       if(!user.paid){
-        // bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим <a href="${siteUrl}">посиланням</a>`, {
-        //   parse_mode: 'HTML'
-        // });
+        bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName} ` : ''} , але не заплатив. Щоб оплатити перейди за цим <a href="${siteUrl}">посиланням</a>`, {
+        parse_mode: 'HTML'
+        });
         continue
       }
-      let filePath = `./${user._id.toString()}_download.jpg`
-      let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${user._id}`
+      let filePath = `./${user._id.toString()}_download.jpg`;
+      let url = `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}`;
 
       console.log('URL:', url, user._id)
       await getUserTicket(filePath, url)
