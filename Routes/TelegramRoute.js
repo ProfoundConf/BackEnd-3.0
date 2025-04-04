@@ -176,7 +176,7 @@ bot.onText(/\/broadcast_tickets/, async (msg) => {
     if (!users.length) {
       bot.sendMessage(chatId, 'Наразі немає користувачів з оплаченими квитками.');
       return;
-    }
+    } 
 
     let successCount = 0;
     let failCount = 0;
