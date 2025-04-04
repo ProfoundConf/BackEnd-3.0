@@ -151,7 +151,7 @@ try {
       //   parse_mode: 'HTML'
       // })
 
-      await bot.sendMessage(chatId, `Ось твій квиток: <a href="${url}">Силка на квиток</a>`, {
+      await bot.sendMessage(chatId, `<a href="${url}">Ось твій квиток :)</a>`, {
         parse_mode: 'HTML'
       });
       
