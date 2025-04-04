@@ -146,10 +146,15 @@ try {
       console.log('URL:', url, user._id)
       await getUserTicket(filePath, url)
 
-      await bot.sendPhoto(chatId, fs.createReadStream(filePath), {
-        caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації\n\n<a href="${url}">Відкрити квиток у браузері</a>`,
+      // await bot.sendPhoto(chatId, fs.createReadStream(filePath), {
+      //   caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації\n\n<a href="${url}">Відкрити квиток у браузері</a>`,
+      //   parse_mode: 'HTML'
+      // })
+
+      await bot.sendMessage(chatId, `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}: <a href="${url}">${url}</a>`, {
         parse_mode: 'HTML'
-      })
+      });
+      
       
       fs.unlink(filePath, () => {})
     }
