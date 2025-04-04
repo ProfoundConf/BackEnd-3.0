@@ -151,10 +151,9 @@ try {
       //   parse_mode: 'HTML'
       // })
 
-      await bot.sendMessage(chatId, `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}: <a href="${url}">${url}</a>`, {
+      await bot.sendMessage(chatId, `<a href="${url}">Ось твій квиток</a>`, {
         parse_mode: 'HTML'
-      });
-      
+      });      
       
       fs.unlink(filePath, () => {})
     }
