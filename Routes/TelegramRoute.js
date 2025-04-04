@@ -146,8 +146,11 @@ try {
       console.log('URL:', url, user._id)
       await getUserTicket(filePath, url)
 
-      await bot.sendPhoto(chatId,fs.createReadStream(filePath), {caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації`})
-
+      await bot.sendPhoto(chatId, fs.createReadStream(filePath), {
+        caption: `Ось твій квиток${users?.length > 1 ? ' ' + user.fullName : ''}, покажи його на реєстрації\n\n<a href="${url}">Відкрити квиток у браузері</a>`,
+        parse_mode: 'HTML'
+      })
+      
       fs.unlink(filePath, () => {})
     }
 
