@@ -28,6 +28,7 @@ const contactValidation = Joi.object({
 })
 
 const contactOptionalValidation = Joi.object({
+    _id: Joi.objectId().optional().allow(null),
     fullName: Joi.string().optional().allow('', null),
     age: Joi.number().optional().allow(null),
     phone: Joi.string().optional().allow('', null),
@@ -45,7 +46,10 @@ const contactOptionalValidation = Joi.object({
     arrived: Joi.boolean().optional(),
     paid: Joi.boolean().optional(),
     chatId: Joi.number().optional().allow('', null),
-    promoCode: Joi.string().optional().allow('', null)
+    promoCode: Joi.string().optional().allow('', null),
+    createdAt: Joi.date().optional().allow(null),
+    updatedAt: Joi.date().optional().allow(null),
+    __v: Joi.number().optional().allow(null)
 })
 
 module.exports = [
