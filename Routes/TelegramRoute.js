@@ -85,6 +85,17 @@ async function getUserTicket(outputPath, ticketFrontUrl) {
     deviceScaleFactor: 2
   })
 
+  await page.evaluate(() => {
+    const btnL = document.querySelector('.btn-back-laptop');
+    if (btnL) {
+      btnL.remove();
+    }
+    const btn = document.querySelector('.btn-back');
+    if (btn) {
+      btnL.remove();
+    }
+  });
+
   // Set the HTML content
   // await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
@@ -122,9 +133,9 @@ bot.on('contact', async (msg) => {
       )
 
       if(!user.paid){
-        bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим <a href="${siteUrl}">посиланням</a>`, {
-          parse_mode: 'HTML'
-        });
+        // bot.sendMessage(chatId, `Ти зареєструвався ${users?.length > 1 ? `для ${user.fullName}` : ''}, але не заплатив. Щоб оплатити перейди за цим <a href="${siteUrl}">посиланням</a>`, {
+        //   parse_mode: 'HTML'
+        // });
         continue
       }
       let filePath = `./${user._id.toString()}_download.jpg`

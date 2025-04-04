@@ -20,9 +20,10 @@ var liqpay = new LiqPay(process.env.LIQPAY_PUBLIC, process.env.LIQPAY_PRIVATE);
 const QRCode = require('qrcode');
 
 validPromoCodes = {
-    'BOND69': 20, 
+    'ROMISTROVKA_FOREVER': 50, 
     'FIRE': 10,   
     'PRANK': 15,
+    'ILOVEBOOTH': 100
   };
 
 const freeAddresses = [
@@ -150,10 +151,7 @@ module.exports = {
                 {
                     $match: {
                         'needAccommodation': true,
-                        'paid': true,
-                        'location': {
-                            $exists: false
-                        }
+                        'paid': true
                     }
                 },
                 {
@@ -337,12 +335,33 @@ module.exports = {
                     message: 'You are not passing age requirements'
                 }
             }
-            const contact = await Services.ContactService.create(payload)
 
-
-            const payment = await Services.PaymentService.create({ contactId: contact._id })
 
             let amount = 700
+
+            payload.promoCode = payload?.promoCode?.toUpperCase()
+
+            if(payload.promoCode && validPromoCodes[payload.promoCode]){
+                if(payload.promoCode === 'PRANK'){
+                    const contacts = await Services.ContactService.get({promoCode: 'PRANK', paid: true})
+                    if(contacts.length >= 2){
+                        throw  {
+                            statusCode: 403,
+                            message: 'Максимальна кількість квитків для цього промокоду досягнута'
+                        }
+                    }
+                }else if(payload.promoCode === 'ILOVEBOOTH'){
+                    const contacts = await Services.ContactService.get({promoCode: 'ILOVEBOOTH', paid: true})
+                    if(contacts.length >= 5){
+                        throw  {
+                            statusCode: 403,
+                            message: 'Максимальна кількість квитків для цього промокоду досягнута'
+                        }
+                    }
+                }
+
+                amount = amount * (1 - validPromoCodes[payload.promoCode] / 100)
+            }
 
             if (payload.eatDays.Fr) {
                 amount += 150
@@ -352,11 +371,18 @@ module.exports = {
                 amount += 150
             }
 
-            if(payload.promoCode && validPromoCodes[payload?.promoCode?.toUpperCase()]){
-                amount = amount * (1 - validPromoCodes[payload?.promoCode?.toUpperCase()] / 100)
-            }
+            const contact = await Services.ContactService.create(payload)
 
+
+            const payment = await Services.PaymentService.create({ contactId: contact._id })
+
+            
             console.log('AMOUNT:', amount)
+            if(amount === 0){
+                await Services.ContactService.updateOne({ _id: contact._id }, { paid: true })
+                return { contact: contact, html: null }
+            }
+            
             var html = liqpay.cnb_form({
                 'action'         : 'pay',
                 'amount'         :  `${amount}`,
@@ -365,7 +391,7 @@ module.exports = {
                 'order_id'       :  payment._id,
                 'version'        : '3',
                 'result_url': `http${process.env.NODE_ENV !== 'LOCAL' ? 's' : ''}://${process.env.APP_ORIGIN}${ process.env.NODE_ENV === 'LOCAL' ? process.env.APP_HOST : ''}/ticket/${contact._id.toString()}`,
-                'server_url': (process.env.NODE_ENV !== 'LOCAL' ? 'https://backend-30-production.up.railway.app/contacts/paid/' : 'https://15a1-152-89-22-92.ngrok-free.app/contacts/paid/') + payment._id
+                'server_url': (process.env.NODE_ENV !== 'LOCAL' ? 'https://backend-30-production.up.railway.app/contacts/paid/' : 'https://3af3-152-89-22-92.ngrok-free.app/contacts/paid/') + payment._id
             });
 
             return { contact: contact, html }
