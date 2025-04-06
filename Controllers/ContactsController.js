@@ -138,7 +138,7 @@ module.exports = {
             // Transform data
             const mergedData = groupedData.reduce((acc, { city, churches }) => {
                 // Check if city already exists in the accumulator
-                const existingCity = acc.find(item => item.city.trim().toLowerCase().normalize().replace(/[iІі]/g, 'і') === city.trim().toLowerCase().normalize().replace(/[iІі]/g, 'і'));
+                const existingCity = acc.find(item => item.city.trim().normalize().replace(/[iІі]/g, 'і').toUpperCase() === city.trim().normalize().replace(/[iІі]/g, 'і').toUpperCase());
               
                 if (existingCity) {
                   // If the city exists, merge the churches
@@ -154,8 +154,8 @@ module.exports = {
               const normalizeString = (str) => {
                 return str
                   .normalize() // Normalize the string
-                  .toLowerCase() // Convert to lowercase for case-insensitive comparison
-                  .replace(/[iІі]/g, 'і') // Handle similar characters like Latin 'i' and Cyrillic 'і'
+                  .replace(/[iІі]/g, 'і')
+                  .toUpperCase() // Handle similar characters like Latin 'i' and Cyrillic 'і'
                   .trim(); // Remove leading/trailing spaces
               };
               
