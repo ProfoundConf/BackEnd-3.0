@@ -99,44 +99,85 @@ module.exports = {
         try{
             const groupCriteria = [
                 {
-                    $match: {
-                        'needAccommodation': true,
-                        'paid': true
-                    }
+                  $match: {
+                    needAccommodation: true,
+                    paid: true,
+                  },
                 },
                 {
-                    $group: {
-                      _id: { city: "$city", church: "$church" }, // Group by city & church
-                      contacts: { $push: "$$ROOT" } // Push full contact details
-                    }
+                  $project: {
+                    city: { $trim: { input: { $toLower: "$city" } } },  // Convert city to lowercase
+                    church: { $trim: { input: { $toLower: "$church" } } },  // Convert church to lowercase
+                    full: "$$ROOT",
                   },
-                  {
-                    $group: {
-                      _id: "$_id.city", // Group by city
-                      churches: { $push: { k: "$_id.church", v: "$contacts" } } // Store church groups as key-value pairs
-                    }
+                },
+                {
+                  // Group by city and collect all entries (church & contact details)
+                  $group: {
+                    _id: "$city",
+                    churches: {
+                      $push: {
+                        church: "$church",
+                        full: "$full",
+                      },
+                    },
                   },
-                  {
-                    $project: {
-                      _id: 0,
-                      city: "$_id",
-                      churches: { $arrayToObject: "$churches" } // Convert array to object
-                    }
+                },
+                {
+                  // Project the result to have an easier structure for JavaScript processing
+                  $project: {
+                    _id: 0,
+                    city: "$_id",
+                    churches: "$churches",
                   },
-                  {
-                    $group: {
-                      _id: null,
-                      result: { $push: { k: "$city", v: "$churches" } } // Convert final city array to object
-                    }
-                  },
-                  {
-                    $project: {
-                      _id: 0,
-                      result: { $arrayToObject: "$result" } // Convert array to object
-                    }
-                  }
-            ]
-            const contacts = (await Services.ContactService.aggregate(groupCriteria))?.[0]?.result
+                },
+              ];
+              
+            const groupedData = await Services.ContactService.aggregate(groupCriteria)
+
+            // Transform data
+            const mergedData = groupedData.reduce((acc, { city, churches }) => {
+                // Check if city already exists in the accumulator
+                const existingCity = acc.find(item => item.city.trim().toLowerCase().normalize().replace(/[iІі]/g, 'і') === city.trim().toLowerCase().normalize().replace(/[iІі]/g, 'і'));
+              
+                if (existingCity) {
+                  // If the city exists, merge the churches
+                  existingCity.churches = [...existingCity.churches, ...churches];
+                } else {
+                  // Otherwise, add the new city with churches
+                  acc.push({ city, churches });
+                }
+              
+                return acc;
+              }, []);
+
+              const normalizeString = (str) => {
+                return str
+                  .normalize() // Normalize the string
+                  .toLowerCase() // Convert to lowercase for case-insensitive comparison
+                  .replace(/[iІі]/g, 'і') // Handle similar characters like Latin 'i' and Cyrillic 'і'
+                  .trim(); // Remove leading/trailing spaces
+              };
+              
+              const contacts = mergedData.reduce((acc, { city, churches }) => {
+                const churchData = churches.reduce((churchAcc, { church, full }) => {
+                  // Normalize the church name to handle duplicates (e.g. 'church' vs 'church ')
+                  const normalizedChurchName = normalizeString(church);
+              
+                  // Group churches by their normalized name
+                  if (!churchAcc[normalizedChurchName]) churchAcc[normalizedChurchName] = [];
+                  churchAcc[normalizedChurchName].push(full);
+              
+                  return churchAcc;
+                }, {});
+              
+                // Normalize the city name to handle duplicates
+                const normalizedCityName = normalizeString(city);
+              
+                // Add processed city data to the accumulator
+                acc[normalizedCityName] = churchData;
+                return acc;
+              }, {});
 
             return { contacts: contacts }
         }catch(err){
