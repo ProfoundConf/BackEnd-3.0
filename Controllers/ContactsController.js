@@ -327,7 +327,7 @@ module.exports = {
                     }
                 }
             }
-            if(payload.age > 30 || payload.age < 15){
+            if(payload.age > 35 || payload.age < 15){
                 throw {
                     statusCode: 403,
                     message: 'You are not passing age requirements'
