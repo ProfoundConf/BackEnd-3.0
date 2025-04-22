@@ -481,7 +481,44 @@ module.exports = {
         if(payload.arrived && bot && contact.chatId && contact.location) {
             const locationObj = await Services.AddressService.getById(contact.location)
             if(locationObj){
-                bot.sendMessage(contact.chatId, `Вітаю на профаунді!\n\nОсь дані про твоє заселення: \nАдреса: ${locationObj.address}\nКолір: ${locationObj.color}`)
+                let redableColor;
+                switch(locationObj.color){
+                    case 'red': {
+                        redableColor = 'червониий'
+                        break;
+                    }
+                    case 'blue': {
+                        redableColor = 'синій'
+                        break;
+                    }
+                    case 'yellow': {
+                        redableColor = 'жовтий'
+                        break;
+                    }
+                }
+                if(locationObj.color && !redableColor){
+                    redableColor = locationObj.color
+                }
+            let msg = `<b>Вітаю на профаунді!</b>\n\n
+Ось дані про твоє заселення:\n
+`
+                if(locationObj.address){
+                    msg += `<b>Адреса:</b> ${locationObj.address}\n\n`
+                }
+                if(redableColor){
+                    msg += `<b>Колір:</b> ${redableColor}\n\n`
+                }
+                if(locationObj.name){
+                    msg += `<b>Ім'я:</b> ${locationObj.name}\n\n`
+                }
+
+                await bot.sendMessage(contact.chatId, msg, { parse_mode: 'HTML' });
+                if(locationObj.phone){
+                    await bot.sendMessage(contact.chatId, 
+                        `Телефон: [${('+38' + locationObj.phone)?.replace(/\s+/g, '')}](tel:${('+38' + locationObj.phone)?.replace(/\s+/g, '')})`, 
+                        { parse_mode: 'Markdown' }
+                    );
+                }
             }
         }
     
